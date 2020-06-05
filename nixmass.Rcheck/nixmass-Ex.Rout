@@ -1,0 +1,912 @@
+
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "nixmass"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> options(pager = "console")
+> base::assign(".ExTimings", "nixmass-Ex.timings", pos = 'CheckExEnv')
+> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
+> base::assign(".format_ptime",
++ function(x) {
++   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
++   if(!is.na(x[5L])) x[2L] <- x[2L] + x[5L]
++   options(OutDec = '.')
++   format(x[1L:3L], digits = 7L)
++ },
++ pos = 'CheckExEnv')
+> 
+> ### * </HEADER>
+> library('nixmass')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("hsdata")
+> ### * hsdata
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: hsdata
+> ### Title: Daily snow height data for a northern alpine station
+> ### Aliases: hsdata
+> 
+> ### ** Examples
+> 
+> ## Load example data 
+> data("hsdata")
+> 
+> ## explore dataset
+> head(hsdata)
+        date hs
+1 1900-08-01  0
+2 1900-08-02  0
+3 1900-08-03  0
+4 1900-08-04  0
+5 1900-08-05  0
+6 1900-08-06  0
+> plot(hsdata$hs, type="o")
+> 
+> ## compute snow water equivalents
+> o <- nixmass(hsdata, model="delta.snow",verbose=TRUE)
+Using parameters:
+ rho.max  = 401.2588 
+ rho.null = 81.19417 
+ c.ov     = 0.0005104722 
+ k.ov     = 0.3785674 
+ k        = 0.02993175 
+ tau      = 0.02362476 
+ eta.null = 8523356 
+day 1 : 
+day 2 : 
+day 3 : 
+day 4 : 
+day 5 : 
+day 6 : 
+day 7 : 
+day 8 : 
+day 9 : 
+day 10 : 
+day 11 : 
+day 12 : 
+day 13 : 
+day 14 : 
+day 15 : 
+day 16 : 
+day 17 : 
+day 18 : 
+day 19 : 
+day 20 : 
+day 21 : 
+day 22 : 
+day 23 : 
+day 24 : 
+day 25 : 
+day 26 : 
+day 27 : 
+day 28 : 
+day 29 : 
+day 30 : 
+day 31 : 
+day 32 : 
+day 33 : 
+day 34 : 
+day 35 : 
+day 36 : 
+day 37 : 
+day 38 : 
+day 39 : 
+day 40 : 
+day 41 : 
+day 42 : 
+day 43 : 
+day 44 : 
+day 45 : 
+day 46 : 
+day 47 : 
+day 48 : 
+day 49 : 
+day 50 : 
+day 51 : 
+day 52 : 
+day 53 : 
+day 54 : 
+day 55 : 
+day 56 : 
+day 57 : 
+day 58 : 
+day 59 : 
+day 60 : 
+day 61 : 
+day 62 : 
+day 63 : 
+day 64 : 
+day 65 : 
+day 66 : 
+day 67 : 
+day 68 : 
+day 69 : 
+day 70 : 
+day 71 : 
+day 72 : 
+day 73 : 
+day 74 : 
+day 75 : 
+day 76 : 
+day 77 : 
+day 78 : 
+day 79 : 
+day 80 : 
+day 81 : 
+day 82 : 
+day 83 : 
+day 84 : 
+day 85 : 
+day 86 : 
+day 87 : 
+day 88 : 
+day 89 : 
+day 90 : 
+day 91 : 
+day 92 : 
+day 93 : 
+day 94 : 
+day 95 : 
+day 96 : 
+day 97 : 
+day 98 : 
+day 99 : 
+day 100 : 
+day 101 : 
+day 102 : 
+day 103 : 
+day 104 : 
+day 105 : 
+day 106 : 
+day 107 : 
+day 108 : 
+day 109 : 
+day 110 : 
+day 111 : 
+day 112 : 
+day 113 : 
+day 114 : produce layer 1
+day 115 : create new layer 2
+day 116 : scaling: 
+day 117 : scaling: 
+day 118 : scaling: 
+day 119 : scaling: 
+day 120 : scaling: 
+day 121 : scaling: 
+day 122 : drenching: melt no further compaction runoff 
+day 123 : runoff
+day 124 : 
+day 125 : produce layer 1
+day 126 : scaling: 
+day 127 : scaling: 
+day 128 : scaling: 
+day 129 : create new layer 2
+day 130 : scaling: 
+day 131 : scaling: 
+day 132 : scaling: 
+day 133 : scaling: 
+day 134 : scaling: 
+day 135 : scaling: 
+day 136 : scaling: 
+day 137 : scaling: 
+day 138 : scaling: 
+day 139 : scaling: 
+day 140 : create new layer 3
+day 141 : create new layer 4
+day 142 : scaling: 
+day 143 : create new layer 5
+day 144 : drenching: melt compaction 
+day 145 : drenching: melt compaction 
+day 146 : drenching: melt compaction 
+day 147 : scaling: 
+day 148 : scaling: 
+day 149 : scaling: 
+day 150 : scaling: 
+day 151 : scaling: 
+day 152 : scaling: 
+day 153 : scaling: 
+day 154 : scaling: 
+day 155 : scaling: 
+day 156 : scaling: 
+day 157 : scaling: 
+day 158 : scaling: 
+day 159 : scaling: 
+day 160 : scaling: 
+day 161 : scaling: 
+day 162 : scaling: 
+day 163 : scaling: 
+day 164 : scaling: 
+day 165 : scaling: 
+day 166 : scaling: 
+day 167 : scaling: 
+day 168 : scaling: 
+day 169 : scaling: 
+day 170 : scaling: 
+day 171 : scaling: 
+day 172 : scaling: 
+day 173 : scaling: 
+day 174 : create new layer 6
+day 175 : scaling: 
+day 176 : scaling: 
+day 177 : scaling: 
+day 178 : scaling: 
+day 179 : scaling: 
+day 180 : scaling: 
+day 181 : create new layer 7
+day 182 : create new layer 8
+day 183 : scaling: 
+day 184 : scaling: 
+day 185 : scaling: 
+day 186 : scaling: 
+day 187 : scaling: 
+day 188 : scaling: 
+day 189 : scaling: 
+day 190 : drenching: melt compaction 
+day 191 : scaling: 
+day 192 : scaling: 
+day 193 : create new layer 9
+day 194 : create new layer 10
+day 195 : create new layer 11
+day 196 : create new layer 12
+day 197 : create new layer 13
+day 198 : create new layer 14
+day 199 : create new layer 15
+day 200 : drenching: melt compaction 
+day 201 : create new layer 16
+day 202 : create new layer 17
+day 203 : scaling: 
+day 204 : create new layer 18
+day 205 : create new layer 19
+day 206 : create new layer 20
+day 207 : drenching: melt compaction 
+day 208 : create new layer 21
+day 209 : drenching: melt compaction 
+day 210 : scaling: 
+day 211 : create new layer 22
+day 212 : drenching: melt compaction 
+day 213 : drenching: melt compaction 
+day 214 : drenching: melt compaction 
+day 215 : drenching: melt compaction 
+day 216 : drenching: melt compaction 
+day 217 : drenching: melt compaction 
+day 218 : drenching: melt compaction 
+day 219 : create new layer 23
+day 220 : scaling: 
+day 221 : scaling: 
+day 222 : create new layer 24
+day 223 : drenching: melt compaction 
+day 224 : create new layer 25
+day 225 : create new layer 26
+day 226 : drenching: melt compaction 
+day 227 : drenching: melt compaction 
+day 228 : scaling: 
+day 229 : drenching: melt no further compaction runoff 
+day 230 : drenching: melt no further compaction runoff 
+day 231 : drenching: melt no further compaction runoff 
+day 232 : create new layer 27
+day 233 : drenching: melt compaction 
+day 234 : scaling:  runoff
+day 235 : scaling: 
+day 236 : scaling: 
+day 237 : create new layer 28
+day 238 : create new layer 29
+day 239 : drenching: melt compaction 
+day 240 : drenching: melt compaction 
+day 241 : scaling: 
+day 242 : create new layer 30
+day 243 : drenching: melt no further compaction runoff 
+day 244 : drenching: melt no further compaction runoff 
+day 245 : drenching: melt no further compaction runoff 
+day 246 : drenching: melt no further compaction runoff 
+day 247 : drenching: melt no further compaction runoff 
+day 248 : drenching: melt no further compaction runoff 
+day 249 : drenching: melt no further compaction runoff 
+day 250 : drenching: melt no further compaction runoff 
+day 251 : drenching: melt no further compaction runoff 
+day 252 : drenching: melt no further compaction runoff 
+day 253 : runoff
+day 254 : 
+day 255 : 
+day 256 : 
+day 257 : 
+day 258 : 
+day 259 : 
+day 260 : 
+day 261 : 
+day 262 : 
+day 263 : 
+day 264 : 
+day 265 : 
+day 266 : 
+day 267 : 
+day 268 : 
+day 269 : 
+day 270 : 
+day 271 : 
+day 272 : 
+day 273 : 
+day 274 : 
+day 275 : 
+day 276 : 
+day 277 : 
+day 278 : 
+day 279 : 
+day 280 : 
+day 281 : 
+day 282 : 
+day 283 : 
+day 284 : 
+day 285 : 
+day 286 : 
+day 287 : 
+day 288 : 
+day 289 : 
+day 290 : 
+day 291 : 
+day 292 : 
+day 293 : 
+day 294 : 
+day 295 : 
+day 296 : 
+day 297 : 
+day 298 : 
+day 299 : 
+day 300 : 
+day 301 : 
+day 302 : 
+day 303 : 
+day 304 : 
+day 305 : 
+day 306 : 
+day 307 : 
+day 308 : 
+day 309 : 
+day 310 : 
+day 311 : 
+day 312 : 
+day 313 : 
+day 314 : 
+day 315 : 
+day 316 : 
+day 317 : 
+day 318 : 
+day 319 : 
+day 320 : 
+day 321 : 
+day 322 : 
+day 323 : 
+day 324 : 
+day 325 : 
+day 326 : 
+day 327 : 
+day 328 : 
+day 329 : 
+day 330 : 
+day 331 : 
+day 332 : 
+day 333 : 
+day 334 : 
+day 335 : 
+day 336 : 
+day 337 : 
+day 338 : 
+day 339 : 
+day 340 : 
+day 341 : 
+day 342 : 
+day 343 : 
+day 344 : 
+day 345 : 
+day 346 : 
+day 347 : 
+day 348 : 
+day 349 : 
+day 350 : 
+day 351 : 
+day 352 : 
+day 353 : 
+day 354 : 
+day 355 : 
+day 356 : 
+day 357 : 
+day 358 : 
+day 359 : 
+day 360 : 
+day 361 : 
+day 362 : 
+day 363 : 
+day 364 : 
+day 365 : 
+> plot(o)
+>      
+> o1 <- nixmass(hsdata, alt=600, region.jo09 = 6, region.gu19 = "central",
++              snowclass.st10 = "alpine", verbose = FALSE)
+> plot(o1)
+> summary(o1)
+$delta.snow
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    0.00    0.00   38.58   28.35  282.25 
+
+$jo09
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    0.00    0.00   44.26   30.10  393.64 
+
+$pi16
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    0.00    0.00   44.71   32.64  410.80 
+
+$st10
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    0.00    0.00   44.69   29.30  439.41 
+
+$gu19
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+  0.000   0.000   5.328  56.321  52.000 378.767      92 
+
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("hsdata", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("nixmass")
+> ### * nixmass
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: nixmass
+> ### Title: SWE modeling with the delta.snow process based model and several
+> ###   emprical regression models.
+> ### Aliases: nixmass
+> 
+> ### ** Examples
+> 
+> ## Load example data with realistic snow height values 
+> ## from a station at 600 meters in the northern Alps
+> ## Note that the winter season is set to an arbitrary date 
+> ## to mask its origin
+> data("hsdata")
+> o <- nixmass(hsdata, model="delta.snow",verbose=TRUE)
+Using parameters:
+ rho.max  = 401.2588 
+ rho.null = 81.19417 
+ c.ov     = 0.0005104722 
+ k.ov     = 0.3785674 
+ k        = 0.02993175 
+ tau      = 0.02362476 
+ eta.null = 8523356 
+day 1 : 
+day 2 : 
+day 3 : 
+day 4 : 
+day 5 : 
+day 6 : 
+day 7 : 
+day 8 : 
+day 9 : 
+day 10 : 
+day 11 : 
+day 12 : 
+day 13 : 
+day 14 : 
+day 15 : 
+day 16 : 
+day 17 : 
+day 18 : 
+day 19 : 
+day 20 : 
+day 21 : 
+day 22 : 
+day 23 : 
+day 24 : 
+day 25 : 
+day 26 : 
+day 27 : 
+day 28 : 
+day 29 : 
+day 30 : 
+day 31 : 
+day 32 : 
+day 33 : 
+day 34 : 
+day 35 : 
+day 36 : 
+day 37 : 
+day 38 : 
+day 39 : 
+day 40 : 
+day 41 : 
+day 42 : 
+day 43 : 
+day 44 : 
+day 45 : 
+day 46 : 
+day 47 : 
+day 48 : 
+day 49 : 
+day 50 : 
+day 51 : 
+day 52 : 
+day 53 : 
+day 54 : 
+day 55 : 
+day 56 : 
+day 57 : 
+day 58 : 
+day 59 : 
+day 60 : 
+day 61 : 
+day 62 : 
+day 63 : 
+day 64 : 
+day 65 : 
+day 66 : 
+day 67 : 
+day 68 : 
+day 69 : 
+day 70 : 
+day 71 : 
+day 72 : 
+day 73 : 
+day 74 : 
+day 75 : 
+day 76 : 
+day 77 : 
+day 78 : 
+day 79 : 
+day 80 : 
+day 81 : 
+day 82 : 
+day 83 : 
+day 84 : 
+day 85 : 
+day 86 : 
+day 87 : 
+day 88 : 
+day 89 : 
+day 90 : 
+day 91 : 
+day 92 : 
+day 93 : 
+day 94 : 
+day 95 : 
+day 96 : 
+day 97 : 
+day 98 : 
+day 99 : 
+day 100 : 
+day 101 : 
+day 102 : 
+day 103 : 
+day 104 : 
+day 105 : 
+day 106 : 
+day 107 : 
+day 108 : 
+day 109 : 
+day 110 : 
+day 111 : 
+day 112 : 
+day 113 : 
+day 114 : produce layer 1
+day 115 : create new layer 2
+day 116 : scaling: 
+day 117 : scaling: 
+day 118 : scaling: 
+day 119 : scaling: 
+day 120 : scaling: 
+day 121 : scaling: 
+day 122 : drenching: melt no further compaction runoff 
+day 123 : runoff
+day 124 : 
+day 125 : produce layer 1
+day 126 : scaling: 
+day 127 : scaling: 
+day 128 : scaling: 
+day 129 : create new layer 2
+day 130 : scaling: 
+day 131 : scaling: 
+day 132 : scaling: 
+day 133 : scaling: 
+day 134 : scaling: 
+day 135 : scaling: 
+day 136 : scaling: 
+day 137 : scaling: 
+day 138 : scaling: 
+day 139 : scaling: 
+day 140 : create new layer 3
+day 141 : create new layer 4
+day 142 : scaling: 
+day 143 : create new layer 5
+day 144 : drenching: melt compaction 
+day 145 : drenching: melt compaction 
+day 146 : drenching: melt compaction 
+day 147 : scaling: 
+day 148 : scaling: 
+day 149 : scaling: 
+day 150 : scaling: 
+day 151 : scaling: 
+day 152 : scaling: 
+day 153 : scaling: 
+day 154 : scaling: 
+day 155 : scaling: 
+day 156 : scaling: 
+day 157 : scaling: 
+day 158 : scaling: 
+day 159 : scaling: 
+day 160 : scaling: 
+day 161 : scaling: 
+day 162 : scaling: 
+day 163 : scaling: 
+day 164 : scaling: 
+day 165 : scaling: 
+day 166 : scaling: 
+day 167 : scaling: 
+day 168 : scaling: 
+day 169 : scaling: 
+day 170 : scaling: 
+day 171 : scaling: 
+day 172 : scaling: 
+day 173 : scaling: 
+day 174 : create new layer 6
+day 175 : scaling: 
+day 176 : scaling: 
+day 177 : scaling: 
+day 178 : scaling: 
+day 179 : scaling: 
+day 180 : scaling: 
+day 181 : create new layer 7
+day 182 : create new layer 8
+day 183 : scaling: 
+day 184 : scaling: 
+day 185 : scaling: 
+day 186 : scaling: 
+day 187 : scaling: 
+day 188 : scaling: 
+day 189 : scaling: 
+day 190 : drenching: melt compaction 
+day 191 : scaling: 
+day 192 : scaling: 
+day 193 : create new layer 9
+day 194 : create new layer 10
+day 195 : create new layer 11
+day 196 : create new layer 12
+day 197 : create new layer 13
+day 198 : create new layer 14
+day 199 : create new layer 15
+day 200 : drenching: melt compaction 
+day 201 : create new layer 16
+day 202 : create new layer 17
+day 203 : scaling: 
+day 204 : create new layer 18
+day 205 : create new layer 19
+day 206 : create new layer 20
+day 207 : drenching: melt compaction 
+day 208 : create new layer 21
+day 209 : drenching: melt compaction 
+day 210 : scaling: 
+day 211 : create new layer 22
+day 212 : drenching: melt compaction 
+day 213 : drenching: melt compaction 
+day 214 : drenching: melt compaction 
+day 215 : drenching: melt compaction 
+day 216 : drenching: melt compaction 
+day 217 : drenching: melt compaction 
+day 218 : drenching: melt compaction 
+day 219 : create new layer 23
+day 220 : scaling: 
+day 221 : scaling: 
+day 222 : create new layer 24
+day 223 : drenching: melt compaction 
+day 224 : create new layer 25
+day 225 : create new layer 26
+day 226 : drenching: melt compaction 
+day 227 : drenching: melt compaction 
+day 228 : scaling: 
+day 229 : drenching: melt no further compaction runoff 
+day 230 : drenching: melt no further compaction runoff 
+day 231 : drenching: melt no further compaction runoff 
+day 232 : create new layer 27
+day 233 : drenching: melt compaction 
+day 234 : scaling:  runoff
+day 235 : scaling: 
+day 236 : scaling: 
+day 237 : create new layer 28
+day 238 : create new layer 29
+day 239 : drenching: melt compaction 
+day 240 : drenching: melt compaction 
+day 241 : scaling: 
+day 242 : create new layer 30
+day 243 : drenching: melt no further compaction runoff 
+day 244 : drenching: melt no further compaction runoff 
+day 245 : drenching: melt no further compaction runoff 
+day 246 : drenching: melt no further compaction runoff 
+day 247 : drenching: melt no further compaction runoff 
+day 248 : drenching: melt no further compaction runoff 
+day 249 : drenching: melt no further compaction runoff 
+day 250 : drenching: melt no further compaction runoff 
+day 251 : drenching: melt no further compaction runoff 
+day 252 : drenching: melt no further compaction runoff 
+day 253 : runoff
+day 254 : 
+day 255 : 
+day 256 : 
+day 257 : 
+day 258 : 
+day 259 : 
+day 260 : 
+day 261 : 
+day 262 : 
+day 263 : 
+day 264 : 
+day 265 : 
+day 266 : 
+day 267 : 
+day 268 : 
+day 269 : 
+day 270 : 
+day 271 : 
+day 272 : 
+day 273 : 
+day 274 : 
+day 275 : 
+day 276 : 
+day 277 : 
+day 278 : 
+day 279 : 
+day 280 : 
+day 281 : 
+day 282 : 
+day 283 : 
+day 284 : 
+day 285 : 
+day 286 : 
+day 287 : 
+day 288 : 
+day 289 : 
+day 290 : 
+day 291 : 
+day 292 : 
+day 293 : 
+day 294 : 
+day 295 : 
+day 296 : 
+day 297 : 
+day 298 : 
+day 299 : 
+day 300 : 
+day 301 : 
+day 302 : 
+day 303 : 
+day 304 : 
+day 305 : 
+day 306 : 
+day 307 : 
+day 308 : 
+day 309 : 
+day 310 : 
+day 311 : 
+day 312 : 
+day 313 : 
+day 314 : 
+day 315 : 
+day 316 : 
+day 317 : 
+day 318 : 
+day 319 : 
+day 320 : 
+day 321 : 
+day 322 : 
+day 323 : 
+day 324 : 
+day 325 : 
+day 326 : 
+day 327 : 
+day 328 : 
+day 329 : 
+day 330 : 
+day 331 : 
+day 332 : 
+day 333 : 
+day 334 : 
+day 335 : 
+day 336 : 
+day 337 : 
+day 338 : 
+day 339 : 
+day 340 : 
+day 341 : 
+day 342 : 
+day 343 : 
+day 344 : 
+day 345 : 
+day 346 : 
+day 347 : 
+day 348 : 
+day 349 : 
+day 350 : 
+day 351 : 
+day 352 : 
+day 353 : 
+day 354 : 
+day 355 : 
+day 356 : 
+day 357 : 
+day 358 : 
+day 359 : 
+day 360 : 
+day 361 : 
+day 362 : 
+day 363 : 
+day 364 : 
+day 365 : 
+> plot(o)
+>      
+> o1 <- nixmass(hsdata, alt=600, region.jo09=6, region.gu19 = "central",
++              snowclass.st10 = "alpine", verbose = FALSE)
+> plot(o1)
+> summary(o1)
+$delta.snow
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    0.00    0.00   38.58   28.35  282.25 
+
+$jo09
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    0.00    0.00   44.26   30.10  393.64 
+
+$pi16
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    0.00    0.00   44.71   32.64  410.80 
+
+$st10
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    0.00    0.00   44.69   29.30  439.41 
+
+$gu19
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+  0.000   0.000   5.328  56.321  52.000 378.767      92 
+
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("nixmass", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> ### * <FOOTER>
+> ###
+> cleanEx()
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  4.35 0.34 5.88 NA NA 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')
