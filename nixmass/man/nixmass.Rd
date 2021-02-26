@@ -25,7 +25,7 @@ nixmass(data, model = c("delta.snow","jo09","pi16","st10","gu19"),
 \code{nixmass}{ This function is a wrapper for the computation of SWE with different models. The process based model \code{\link[=swe.delta.snow]{delta.snow}} can be chosen, as well as different empirical regression models of \code{\link[=swe.jo09]{Jonas},\link[=swe.pi16]{Pistocchi}, \link[=swe.st10]{Sturm}} and \link[=swe.gu19]{Guyennon}}.
 For the "delta.snow" model and the ones of "Pistocchi" and "Guyennon", the needed parameters and coefficients from the original references are set as default. They can however be changed according to results from other datasets. For the other models of "Jonas" and "Sturm" regression coefficients are fixed. 
 
-In its current implementation, matrices holding the snowpack and all its layers are predefined. This makes the iteration over the whole provided period of snow depth values slow, if many years have to be modeled at once. It is therefore strongly recommended to split computation of SWE values into single years, separated by zero values for snow depth. In a future implementation, this will be speeded up. By computing only two days at once, pre-allocation of matrices can be restricted, but may not be completely avoided.
+If many years have to be modeled at once, it is recommended to split the computation into single years, separated by zero values for snow depth. 
 }
 
 \value{
