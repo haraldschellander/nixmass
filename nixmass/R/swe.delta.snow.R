@@ -1,4 +1,4 @@
-swe.delta.snow1 <- function(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.0005104722, k.ov=0.37856737, k=0.02993175, tau=0.02362476, eta.null=8523356, timestep=24, verbose=FALSE) {
+swe.delta.snow <- function(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.0005104722, k.ov=0.37856737, k=0.02993175, tau=0.02362476, eta.null=8523356, timestep=24, verbose=FALSE) {
      
      if(!inherits(data,"data.frame"))
           stop("swe.deltasnow: data must be of class data.frame")

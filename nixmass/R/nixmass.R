@@ -41,13 +41,14 @@ summary.nixmass <- function(object, ...){
   if(length(models) == 0)
     stop("nixmass: Cannot print anything. No model was computed.")
   
-  res <- c()
-  for(m in models){
-    res <- rbind(res,object$swe[[m]])  
-  }
-  rownames(res) <- models
-  print(apply(res,1,summary))
-  
+  l <- lapply(object$swe,quantile, na.rm=T)
+  lm <- lapply(object$swe,mean, na.rm=T)
+  m <- do.call(rbind,l)
+  mm <- sapply(lm,c)
+  mmm <- cbind(m,mm)
+  mmm <- mmm[,c(1:3,6,4,5)]
+  colnames(mmm) <- c("Min.","1st Qu.","Median","Mean","3rd Qu.","Max.")
+  print(mmm)
 }
 
 
