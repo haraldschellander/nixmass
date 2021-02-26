@@ -377,9 +377,9 @@ swe.delta.snow1 <- function(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.00
                                      SWE[t]        <- sum(swe[,2])
                                      
                                      # only for new layer add new layer to matrices
-                                     h             <- rbind(h,rep(0,3)))
-                                     swe           <- rbind(swe,rep(0,3)))
-                                     age           <- rbind(age,rep(0,3)))   
+                                     h             <- rbind(h,rep(0,3))
+                                     swe           <- rbind(swe,rep(0,3))
+                                     age           <- rbind(age,rep(0,3))   
                                      ly            <- ly + 1
                                      h[ly,2]       <- Hobs[t] - H[t]
                                      swe[ly,2]     <- rho.null * h[ly,2]

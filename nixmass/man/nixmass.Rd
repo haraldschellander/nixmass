@@ -46,7 +46,7 @@ The computation is quite fast and there does not exist any restriction regarding
 \cr\cr 	
  	Sturm, M. et al. (2010) "Estimating Snow Water Equivalent Using Snow Depth Data and Climate Classes", Journal of Hydrometeorology, 11(6), pp. 1380 - 1394. doi: 10.1175/2010JHM1202.1.
 \cr\cr
-Winkler, M., Schellander, H., and Gruber, S. (submitted) "Snow Water Equivalents exclusively from Snow Heights and their temporal Changes: The delta.snow.model". Hydrology and Earth System Sciences Discussions.
+Winkler, M., Schellander, H., and Gruber, S. (2020) "Snow Water Equivalents exclusively from Snow Heights and their temporal Changes: The delta.snow.model". Hydrol. Earth Syst. Sci. Discuss. [preprint], https://doi.org/10.5194/hess-2020-152, in review.
 }
 
 
