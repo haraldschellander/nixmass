@@ -49,7 +49,7 @@ Compression of a snow layer without additional load on top is computed on the ba
  	\cr\cr
  	Sturm, M., Holmgren, J. (1998) "Differences in compaction behavior of three climate classes of snow". Annals of Glaciology 26, 125-130.
  	\cr\cr
- 	Winkler, M., Schellander, H., and Gruber, S. (submitted) "Snow Water Equivalents exclusively from Snow Heights and their temporal Changes: The delta.snow.model". Hydrology and Earth System Sciences Discussions.
+ 	Winkler, M., Schellander, H., and Gruber, S. (2020) "Snow Water Equivalents exclusively from Snow Heights and their temporal Changes: The delta.snow.model". Hydrol. Earth Syst. Sci. Discuss. [preprint], https://doi.org/10.5194/hess-2020-152, in review.
 }
 
 
