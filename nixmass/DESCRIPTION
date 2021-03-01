@@ -1,6 +1,6 @@
 Package: nixmass
-Version: 1.1-0
-Date: 2021-02-26
+Version: 1.0.2
+Date: 2021-03-01
 Title: Snow Water Equivalent Modeling with the 'Delta.snow' Model and Empirical Regression Models
 Authors@R: c(person("Harald", "Schellander", role = c("aut", "cre"), email = "harald.schellander@zamg.ac.at"),
 			 person("Michael", "Winkler", role = c("ctb")))
