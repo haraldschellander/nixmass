@@ -99,9 +99,9 @@ swe.delta.snow <- function(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.000
      assignH <- function(sp.dd, h, swe, age, H, SWE, t, day.tot){
              if(t < day.tot){
                      # next timestep is always 3                
-                     h[,3]   <- sp.dd$h
-                     swe[,3] <- sp.dd$swe
-                     age[,3] <- sp.dd$age
+                     h[,3]    <- sp.dd$h
+                     swe[,3]  <- sp.dd$swe
+                     age[,3]  <- sp.dd$age
                      H[t+1]   <- sum(h[,3])
                      SWE[t+1] <- sum(swe[,3])
              }
@@ -163,11 +163,11 @@ swe.delta.snow <- function(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.000
              snowpack.tomorrow <- dry_compaction(h[,2], swe[,2], age[,2], ly.tot, ly, k, rho.max, ts, prec, g)
              
              # set values for next day
-             rl <- assignH(snowpack.tomorrow, h, swe, age, H, SWE, t, day.tot)
-             h <- rl$h
+             rl  <- assignH(snowpack.tomorrow, h, swe, age, H, SWE, t, day.tot)
+             h   <- rl$h
              swe <- rl$swe
              age <- rl$age
-             H <- rl$H
+             H   <- rl$H
              SWE <- rl$SWE
              
              return(list(h=h, swe=swe, age=age, H=H, SWE=SWE))
@@ -178,11 +178,11 @@ swe.delta.snow <- function(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.000
              # .d  -> yesterday
              # .dd -> today
              # previous timestep is always 1
-             Hobs.d  = Hobs[t-1]
-             Hobs.dd = Hobs[t]
-             h.d     = h[,1]
-             swe.d   = swe[,1]
-             age.d   = age[,2]  
+             Hobs.d  <- Hobs[t-1]
+             Hobs.dd <- Hobs[t]
+             h.d     <- h[,1]
+             swe.d   <- swe[,1]
+             age.d   <- age[,2]  
              
              # todays overburden   
              swe.hat.d <- c()
@@ -257,7 +257,7 @@ swe.delta.snow <- function(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.000
              age[,2] <- age.d
              H[t]    <- sum(h[,2])
              SWE[t]  <- sum(swe[,2])
-             ly.tot <- nrow(h)
+             ly.tot  <- nrow(h)
              
              # compact actual day 
              # if all layers already have maximum density rho.max
@@ -265,11 +265,11 @@ swe.delta.snow <- function(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.000
              snowpack.tomorrow <- dry_compaction(h[,2], swe[,2], age[,2], ly.tot, ly, k, rho.max, ts, prec, g)
              
              # set values for next day
-             rl <- assignH(snowpack.tomorrow, h, swe, age, H, SWE, t, day.tot)
-             h <- rl$h
+             rl  <- assignH(snowpack.tomorrow, h, swe, age, H, SWE, t, day.tot)
+             h   <- rl$h
              swe <- rl$swe
              age <- rl$age
-             H <- rl$H
+             H   <- rl$H
              SWE <- rl$SWE
              
              return(list(h=h, swe=swe, age=age, H=H, SWE=SWE))
@@ -313,9 +313,9 @@ swe.delta.snow <- function(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.000
              msg(m,t,paste("day",t,": "))
              
              # shift temporary matrices one step back in time
-             h   <- cbind(h,0);   h   <- h[,-1]        
-             swe <- cbind(swe,0); swe <- swe[,-1]        
-             age <- cbind(age,0); age <- age[,-1]        
+             h[,1] <- h[,2]; h[,2] <- h[,3]; h[,3] <- 0
+             swe[,1] <- swe[,2]; swe[,2] <- swe[,3]; swe[,3] <- 0
+             age[,1] <- age[,2]; age[,2] <- age[,3]; age[,3] <- 0
             
              # snowdepth = 0, no snow cover
              if( Hobs[t] == 0 ){      
