@@ -1,0 +1,505 @@
+swe.delta.snow.rho <- function(data, 
+                               sigma_rho_max = 0.02930074,
+                               mu_rho_max = 135.0364,
+                               rho_max_h = 590.8852,
+                               rho_max_l = 359.0487,
+                               sigma_rho_null = 2.756484,
+                               mu_rho_null = 0.4927341,
+                               rho_null_h = 150.005,
+                               rho_null_l = 51.61044, 
+                               c.ov = 0.0005166076,
+                               k.ov = 0.3761624,
+                               k = 0.02873629,
+                               tau = 0.02370144,
+                               eta.null = 8342099,      
+                               timestep = 24, verbose = FALSE) {
+                    
+        
+        if(!inherits(data,"data.frame"))
+                stop("swe.deltasnow: data must be of class data.frame")
+        
+        if(!any((is.element(colnames(data), c("hs","date")))))
+                stop("swe.deltasnow: data must contain at least two columns named 'hs' and 'date'")
+        
+        Hobs <- data$hs
+        if(any(is.na(Hobs)))
+                stop("swe.deltasnow: snow depth data must not be NA")
+        if(!all(Hobs >= 0))
+                stop("swe.deltasnow: snow depth data must not be negative")
+        if(!is.numeric(Hobs))
+                stop("swe.deltasnow: snow depth data must be numeric")
+        if(Hobs[1] != 0)
+                stop("swe.deltasnow: snow depth observations must start with 0")
+        
+        if(!inherits(data$date,"character"))
+                stop("swe.deltasnow: date column must be of class character")
+        
+        z <- zoo(Hobs,as.Date(data$date))
+        if(!is.regular(z, strict = TRUE))
+                stop("swe.deltasnow: date column must be strictly regular")
+        
+        nixmass.e <- new.env()
+        nixmass.e$snowpack.dd <- NULL
+        
+        H       <- c()                              # modeled total depth of snow at any timestep [m]
+        SWE     <- c()                              # modeled total SWE at any timestep [kg/m2]
+        ly      <- 1                                # layer number [-]
+        ts      <- timestep * 3600                  # timestep between observations [s]
+        g       <- 9.81                             # gravity [ms-2]
+        
+        # pre-allocate some variables   
+        # one row for first layer and 3 cols 
+        # for timestep-1, timestep, timestep+1
+        h       <- matrix(0, 1, 3)                  # modeled depth of snow in all layers [m]
+        swe     <- matrix(0, 1, 3)                  # modeled swe in all layers [kg/m2]
+        age     <- matrix(0, 1, 3)                  # age of modeled layers [days]
+        
+        day.tot <- length(Hobs)                     # total days from first to last snowfall [-]
+        
+        
+        # helper
+        m       <- rep("",day.tot)                  # vector of (verbose) messages
+        prec    <- 10^-10                           # precision for arithmetic comparisons [-]
+        
+        
+        
+        #-------------------------------------------------------------------------
+        # initial density depends on amount of "new" snow, i.e. delta Hobs 
+        #-------------------------------------------------------------------------
+        rho_null_dyn <- function(dh){
+                atan(sigma_rho_null * (dh - mu_rho_null)) * 
+                        (rho_null_h - rho_null_l)/pi + 
+                        (rho_null_h + rho_null_l)/2
+        }
+        
+        
+        #-------------------------------------------------------------------------
+        # layer-individual maximum density depends on layer age 
+        #-------------------------------------------------------------------------
+        rho_max_dyn <- function(t){
+                atan(sigma_rho_max * (t - mu_rho_max)) * 
+                        (rho_max_h - rho_max_l)/pi + 
+                        (rho_max_h + rho_max_l)/2
+        }
+        
+        
+        #-------------------------------------------------------------------------
+        # compaction of snowpack
+        #-------------------------------------------------------------------------
+        dry_compaction <- function(h.d, swe.d, age.d, ly.tot, ly, k, ts, prec, g){
+                # .d  -> today
+                # .dd -> tomorrow
+                # compute overburden for each layer
+                # the overburden for the first layer is the layer itself
+                swe.hat.d <- c()
+                for(i in 1:ly.tot){
+                        swe.hat.d[i] <- sum(swe.d[i:ly.tot])
+                }
+                
+                snowpack.d   <- data.frame(h  = h.d, swe = swe.d, swe.hat = swe.hat.d, age = age.d)
+                H.d          <- sum(snowpack.d$h)
+                
+                a <- data.frame(t(apply(snowpack.d[(1:ly),], 1, compactH, H.d, k, ts, prec, g, eta.null)))
+                b <- data.frame(rep(0, ly.tot - ly), rep(0, ly.tot - ly), rep(0, ly.tot - ly), rep(0, ly.tot - ly))
+                colnames(a) <- colnames(b) <- c("h", "swe", "age", "rho")
+                nixmass.e$snowpack.dd <<- rbind(a, b)
+                rownames(nixmass.e$snowpack.dd) <<- paste0("dd.layer", 1:nrow(nixmass.e$snowpack.dd))
+                return(nixmass.e$snowpack.dd)
+        }
+        
+        
+        
+        #-------------------------------------------------------------------------
+        # compaction of individual snow layers without additional load 
+        # today's values are compacted to tomorrow's values
+        #-------------------------------------------------------------------------
+        compactH <- function(x, H.d, k, ts, prec, g, eta.null){
+                # .d  -> today
+                # .dd -> tomorrow
+                age.d <- ifelse(x[1] == 0, 0, x[4])
+                age.dd  <- ifelse(x[1] == 0, 0, age.d + 1)
+                rho.max.d <- rho_max_dyn(age.d)
+                h.dd <- x[1]/(1 + (x[3] * g * ts)/eta.null * exp(-k * x[2]/x[1]))
+                h.dd <- ifelse(x[2]/h.dd > rho.max.d, x[2]/rho.max.d, h.dd)
+                h.dd <- ifelse(x[1] == 0, 0, h.dd)
+                swe.dd  <- x[2]
+                rho.dd  <- ifelse(x[1] == 0, 0, swe.dd/h.dd)
+                rho.dd  <- ifelse(rho.max.d - rho.dd < prec, rho.max.d, rho.dd)
+                return(cbind(h = h.dd, swe = swe.dd, age = age.dd, rho = rho.dd))
+        }
+        
+        
+        
+        #-------------------------------------------------------------------------
+        # assigns snowpack properties of the next timestep
+        #-------------------------------------------------------------------------
+        assignH <- function(sp.dd, h, swe, age, H, SWE, t, day.tot){
+                if(t < day.tot){
+                        # next timestep is always 3                
+                        h[, 3]    <- sp.dd$h
+                        swe[, 3]  <- sp.dd$swe
+                        age[, 3]  <- sp.dd$age
+                        H[t + 1]   <- sum(h[, 3])
+                        SWE[t + 1] <- sum(swe[, 3])
+                }
+                return(list(h = h, swe = swe, age = age, H = H, SWE = SWE))
+        }
+        
+        
+        #-------------------------------------------------------------------------
+        # disribute swe top-down 
+        # release runoff if compacted to layer-specific rho.max
+        #-------------------------------------------------------------------------
+        drenchH <- function(t, ly, ly.tot, day.tot, Hobs, h, swe, age, H, SWE, c.ov, k.ov, k, ts, prec, m){
+                msg(m, t, paste("melt, "))
+                
+                Hobs.d = Hobs[t]
+                h.d = h[, 2]
+                swe.d = swe[, 2]
+                age.d = age[, 2]
+                
+                runoff <- 0
+                
+                # distribute mass top-down
+                for(i in ly:1){
+                        rho.max <- rho_max_dyn(age.d[i])
+                        if( sum(h.d[-i]) + swe.d[i]/rho.max - Hobs.d >= prec ){
+                                # layer is densified to rho.max
+                                h.d[i] <- swe.d[i]/rho.max  
+                        } else {
+                                # layer is densified as far as possible
+                                # but doesnt reach rho.max
+                                h.d[i] <- swe.d[i]/rho.max + abs(sum(h.d[-i]) + swe.d[i]/rho.max - Hobs.d) 
+                                break
+                        }
+                        
+                }
+                
+                # all layers have rho.max
+                if( all(rho_max_dyn(age.d[1:ly]) - swe.d[1:ly]/h.d[1:ly] <= prec) ){
+                        msg(m, t, paste("no further compaction, "))
+                        
+                        # produce runoff if sum(h.d) - Hobs.d is still > 0
+                        msg(m, t, paste("runoff "))
+                        scale <- Hobs.d/sum(h.d)
+                        swe_total.d <- c()
+                        hobs.d <- c()
+                        runoff.d <- c()
+                        rho.max.d <- c()
+                        for(i in 1:ly){
+                                rho.max.d[i] <- rho_max_dyn(age.d[i])
+                                swe_total.d[i] <- h.d[i] * rho.max.d[i]
+                                hobs.d[i] <- Hobs.d * h.d[i]/sum(h.d)
+                                runoff.d[i] <- swe_total.d[i] - hobs.d[i] * rho.max.d[i]
+                        }
+                        runoff <- sum(runoff.d) 
+                        h.d <- h.d * scale  # all layers are compressed (and have rho.max) [m]
+                        swe.d[1:ly] <- h.d[1:ly] * rho.max.d[1:ly]
+                        
+                        
+                } else {
+                        msg(m, t, paste("compaction, "))
+                }
+                
+                h[, 2]   <- h.d
+                swe[, 2] <- swe.d
+                age[, 2] <- age.d
+                H[t]     <- sum(h[, 2])
+                SWE[t]   <- sum(swe[, 2])
+                ly.tot   <- nrow(h)
+                
+                # no further compaction possible
+                snowpack.tomorrow <- dry_compaction(h[, 2], swe[, 2], age[, 2], ly.tot, ly, k, ts, prec, g)
+                
+                # set values for next day
+                rl  <- assignH(snowpack.tomorrow, h, swe, age, H, SWE, t, day.tot)
+                h   <- rl$h
+                swe <- rl$swe
+                age <- rl$age
+                H   <- rl$H
+                SWE <- rl$SWE
+                
+                return(list(h = h, swe = swe, age = age, H = H, SWE = SWE))
+        }
+        
+        
+        
+        #-------------------------------------------------------------------------
+        # re-compact snowpack from previous timesteps values with adapted eta
+        #-------------------------------------------------------------------------
+        scaleH <- function(t, ly, ly.tot, day.tot, deltaH, Hobs, h, swe, age, H, SWE, k, ts, prec, m){
+                # .d  -> yesterday
+                # .dd -> today
+                # previous timestep is always 1
+                Hobs.d  <- Hobs[t - 1]
+                Hobs.dd <- Hobs[t]
+                h.d     <- h[, 1]
+                swe.d   <- swe[, 1]
+                age.d   <- age[, 2]  
+                rho.max.d <- rho_max_dyn(age.d)
+                
+                # todays overburden   
+                swe.hat.d <- c()
+                for(i in 1:ly.tot){
+                        swe.hat.d[i] <- sum(swe.d[i:ly.tot])
+                }
+                
+                # analytical solution for layerwise adapted viskosity eta
+                # assumption: recompaction ~ linear depth change of yesterdays layers (see paper)
+                eta.cor <- c()
+                for(i in 1:ly.tot){
+                        rho.d <- swe.d[i]/h.d[i]
+                        x <- ts * g * swe.hat.d[i] * exp(-k * rho.d) # yesterday
+                        P <- h.d[i]/Hobs.d # yesterday
+                        eta.i <- Hobs.dd * x * P / (h.d[i] - Hobs.dd * P)
+                        eta.cor <- c(eta.cor, ifelse(is.na(eta.i), 0, eta.i))
+                }
+                
+                # compute H of today with corrected eta
+                # so that modeled H = Hobs
+                h.dd.cor <- h.d/(1 + (swe.hat.d * g * ts)/eta.cor * exp(-k * swe.d/h.d)) 
+                h.dd.cor[which(is.na(h.dd.cor))] <- 0
+                H.dd.cor <- sum(h.dd.cor)
+                
+                # and check, if Hd.cor is the same as Hobs.d
+                if(abs(H.dd.cor - Hobs.dd) > prec)
+                        warning(paste0("day ", t, ": error in exponential re-compaction: H.dd.cor - Hobs.dd = ", H.dd.cor - Hobs.dd))
+                
+                
+                # which layers exceed rho.max?
+                idx.max <- which(swe.d/h.dd.cor - rho.max.d > prec)
+                
+                if(length(idx.max) > 0){
+                        
+                        if(length(idx.max) < ly){
+                                # collect excess swe in those layers
+                                swe.excess <- swe.d[idx.max] - h.dd.cor[idx.max] * rho.max.d[idx.max]
+                                
+                                # set affected layer(s) to rho.max
+                                swe.d[idx.max] <- swe.d[idx.max] - swe.excess             
+                                
+                                # distribute excess swe to other layers top-down
+                                lys <- 1:ly
+                                lys <- lys[-idx.max]
+                                i <- lys[length(lys)]
+                                swe.excess.all <- sum(swe.excess)
+                                while(swe.excess.all > 0){
+                                        swe.res <- h.dd.cor[i] * rho.max.d[i] - swe.d[i] # layer tolerates this swe amount to reach rho.max
+                                        if(swe.res > swe.excess.all){
+                                                swe.res <- swe.excess.all
+                                        }
+                                        swe.d[i]  <- swe.d[i] + swe.res
+                                        swe.excess.all  <- swe.excess.all - swe.res
+                                        i <- i - 1
+                                        if(i<=0 & swe.excess.all > 0){
+                                                msg(m, t, paste(" runoff"))
+                                                break
+                                        }
+                                }
+                        } else {
+                                # if all layers have density > rho.max
+                                # remove swe.excess from all layers (-> runoff)
+                                # (this sets density to rho.max)
+                                swe.excess <- swe.d[idx.max] - h.dd.cor[idx.max] * rho.max.d[idx.max]
+                                swe.d[idx.max] <- swe.d[idx.max] - swe.excess
+                                msg(m, t, paste(" runoff"))
+                        }
+                }
+                
+                h[, 2]   <- h.dd.cor
+                swe[, 2] <- swe.d
+                age[, 2] <- age.d
+                H[t]     <- sum(h[, 2])
+                SWE[t]   <- sum(swe[, 2])
+                ly.tot   <- nrow(h)
+                
+                # compact actual day 
+                # if all layers already have maximum density rho.max
+                # the snowpack will not be changed by the following step
+                snowpack.tomorrow <- dry_compaction(h[, 2], swe[, 2], age[, 2], ly.tot, ly, k, ts, prec, g)
+                
+                # set values for next day
+                rl  <- assignH(snowpack.tomorrow, h, swe, age, H, SWE, t, day.tot)
+                h   <- rl$h
+                swe <- rl$swe
+                age <- rl$age
+                H   <- rl$H
+                SWE <- rl$SWE
+                
+                return(list(h = h, swe = swe, age = age, H = H, SWE = SWE))
+                
+        }
+        
+        
+        #-------------------------------------------------------------------------
+        # keep track of messages in a vector
+        #-------------------------------------------------------------------------
+        msg <- function(m, t, strg){
+                if(verbose){
+                        cat(paste(strg))
+                        if(is.null(m[t])){
+                                m[t] <- strg  
+                        } else {
+                                m[t] <- paste(m[t], strg)
+                        }
+                }  
+        }
+        
+        
+        
+        
+        if(verbose){
+                cat("Using parameters:\n",
+                    "sigma_rho_max =", sigma_rho_max, "\n",
+                    "mu_rho_max =", mu_rho_max, "\n",
+                    "rho_max_h =", rho_max_h, "\n",
+                    "rho_max_l =", rho_max_l, "\n",
+                    "sigma_rho_null =", sigma_rho_null, "\n",
+                    "mu_rho_null =", mu_rho_null, "\n",
+                    "rho_null_h =", rho_null_h, "\n",
+                    "rho_null_l =", rho_null_l,  "\n",
+                    "c.ov =", c.ov, "\n",
+                    "k.ov =", k.ov, "\n",
+                    "k =", k, "\n",
+                    "tau =", tau, "\n",
+                    "eta.null =", eta.null, "\n\n"
+                )
+        }
+        
+        
+        
+        for (t in 1:day.tot) {
+                
+                msg(m, t, paste("timestep", t, ": "))
+                
+                # shift temporary matrices one step back in time
+                h[, 1] <- h[, 2]
+                h[, 2] <- h[, 3]
+                h[, 3] <- 0
+                swe[, 1] <- swe[, 2]
+                swe[, 2] <- swe[, 3]
+                swe[, 3] <- 0
+                age[, 1] <- age[, 2]
+                age[, 2] <- age[, 3]
+                age[, 3] <- 0
+                
+                # snowdepth = 0, no snow cover
+                if( Hobs[t] == 0 ){      
+                        if(t > 1){
+                                if(Hobs[t - 1] == 0){
+                                        msg(m, t, paste0(""))        
+                                } else {
+                                        msg(m, t, paste0("runoff"))
+                                }        
+                        }else {
+                                msg(m, t, paste0(""))         
+                        }
+                        H[t]     <- 0
+                        SWE[t]   <- 0
+                        h[, 2]   <- 0
+                        swe[, 2] <- 0
+                        
+                        # there is snow
+                } else if( Hobs[t] > 0 ){
+                        
+                        # first snow in/during season
+                        if( Hobs[t - 1] == 0 ){
+                                ly <- 1
+                                msg(m, t, paste("produce layer", ly))
+                                age[ly, 2] <- 1
+                                h[ly, 2]   <- Hobs[t]
+                                rho.null   <- rho_null_dyn(Hobs[t])
+                                swe[ly, 2] <- rho.null * Hobs[t]
+                                H[t]       <- Hobs[t]
+                                SWE[t]     <- swe[ly, 2]
+                                ly.tot     <- nrow(h)
+                                
+                                # compact actual day 
+                                snowpack.tomorrow <- dry_compaction(h[, 2], swe[, 2], age[, 2], ly.tot, ly, k, ts, prec, g)
+                                
+                                # set values for next day
+                                rl  <- assignH(snowpack.tomorrow, h, swe, age, H, SWE, t, day.tot)
+                                h   <- rl$h
+                                swe <- rl$swe
+                                age <- rl$age
+                                H   <- rl$H
+                                SWE <- rl$SWE
+                                
+                                
+                                # non-first day of snow covered period
+                        } else if ( Hobs[t - 1] > 0 ){
+                                
+                                deltaH <- Hobs[t] - H[t]
+                                
+                                if( deltaH > tau ){
+                                        msg(m, t, paste("create new layer", ly + 1))
+                                        
+                                        rho.null <- rho_null_dyn(deltaH)
+                                        rho.max.d <- rho_max_dyn(age[, 2])   
+                                        sigma.null <- deltaH * rho.null * g
+                                        epsilon <- c.ov * sigma.null * exp(-k.ov * nixmass.e$snowpack.dd$rho/(rho.max.d - nixmass.e$snowpack.dd$rho))
+                                        
+                                        h[, 2]         <- (1 - epsilon) * h[, 2]
+                                        swe[, 2]       <- swe[, 1]
+                                        age[(1:ly), 2] <- age[(1:ly), 1] + 1
+                                        H[t]           <- sum(h[, 2])
+                                        SWE[t]         <- sum(swe[, 2])
+                                        
+                                        # only for new layer add new layer to matrices
+                                        h              <- rbind(h, rep(0, 3))
+                                        swe            <- rbind(swe, rep(0, 3))
+                                        age            <- rbind(age, rep(0, 3))   
+                                        ly             <- ly + 1
+                                        h[ly, 2]       <- Hobs[t] - H[t]
+                                        swe[ly, 2]     <- rho.null * h[ly, 2]
+                                        age[ly, 2]     <- 1
+                                        
+                                        # recompute
+                                        H[t]          <- sum(h[, 2])
+                                        SWE[t]        <- sum(swe[, 2])
+                                        ly.tot        <- nrow(h)
+                                        
+                                        
+                                        # compact actual day 
+                                        snowpack.tomorrow <- dry_compaction(h[, 2], swe[, 2], age[, 2], ly.tot, ly, k, ts, prec, g)
+                                        
+                                        # set values for next day
+                                        rl  <- assignH(snowpack.tomorrow, h, swe, age, H, SWE, t, day.tot)
+                                        h   <- rl$h
+                                        swe <- rl$swe
+                                        age <- rl$age
+                                        H   <- rl$H
+                                        SWE <- rl$SWE
+                                        
+                                        # no mass gain or loss, but scaling
+                                } else if( deltaH >= -tau & deltaH <= tau ) {
+                                        msg(m, t, paste("scaling: "))
+                                        ly.tot <- nrow(h)
+                                        rl  <- scaleH(t, ly, ly.tot, day.tot, deltaH, Hobs, h, swe, age, H, SWE, k, ts, prec, m)
+                                        h   <- rl$h
+                                        swe <- rl$swe
+                                        age <- rl$age
+                                        H   <- rl$H
+                                        SWE <- rl$SWE
+                                        
+                                } else if ( deltaH < -tau ){
+                                        msg(m, t, paste("drenching: "))
+                                        ly.tot <- nrow(h)
+                                        rl  <- drenchH(t, ly, ly.tot, day.tot, Hobs, h, swe, age, H, SWE, c.ov, k.ov, k, ts, prec, m)
+                                        h   <- rl$h
+                                        swe <- rl$swe
+                                        age <- rl$age
+                                        H   <- rl$H
+                                        SWE <- rl$SWE
+                                        
+                                        
+                                } else {
+                                        msg(m, t, "?")
+                                }
+                        }
+                } 
+                msg(m, t, "\n")
+        }
+        return(SWE)
+        
+}
