@@ -1,7 +1,7 @@
 #' Daily snow depth data for a northern alpine station
 #' 
 #' Gapless daily snow depth observations for a winter season from 1.8. - 31.7. 
-#' from a station situated in the northern earstern alps at an altitude of 600 m. 
+#' from a station situated in the northern eastern alps at an altitude of 600 m. 
 #' For anonymization the years are intentionally set to 1900 - 1901. 
 #' This data series is free of gaps with a minimum of 0 and a maximum of 1.3 meters. 
 #' It is intended to be used as is as input data for the package \code{\link{nixmass}} 
@@ -41,7 +41,7 @@
 NULL
 
 
-#' SWE modeling with the delta.snow process based model and several emprical regression models.
+#' SWE modeling with the delta.snow process based model and several empirical regression models.
 #' 
 #' @description
 #' Snow Water Equivalent (SWE) is modeled either exclusiveley from daily snow depth 
@@ -76,7 +76,10 @@ NULL
 #' "italy", "southwest", "central" or "southeast" as described in the original reference.
 #' @param snowclass.st10 Must be given if one of model is \code{"st10"}. 
 #' Must be one of the following character strings: 
-#' "alpine","maritime","prairie","tundra","taiga" as outlined in the original reference. 
+#' "alpine", "maritime", "prairie", "tundra", "taiga" as outlined in the original reference. 
+#' @param return_full If TRUE, also modeled snow depth and the daily, layerwise matrices of swe, 
+#' snow depth and age are returned. Defaults to FALSE. Is only used 
+#' for the delta.snow model (see \code{\link{swe.delta.snow}}).
 #' @param verbose Logical. Should additional information be given during runtime?
 #'
 #' @return A list of class \code{"nixmass"} with components:
@@ -91,7 +94,7 @@ NULL
 ## Note that the winter season is set to an arbitrary date 
 ## to mask its origin
 #' data("hsdata")
-#' o <- nixmass(hsdata, model="delta.snow",verbose=TRUE)
+#' o <- nixmass(hsdata, model = "delta.snow", verbose = TRUE)
 #' plot(o)
 #' 
 #' o1 <- nixmass(hsdata, alt=600, region.jo09=6, region.gu19 = "central",
@@ -112,7 +115,7 @@ NULL
 #' \cr\cr
 #' Winkler, M., Schellander, H., and Gruber, S.: Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021, 2021.
 
-nixmass <- function(data, model = c("delta.snow","jo09","pi16","st10","gu19"), alt, region.jo09, region.gu19, snowclass.st10, verbose = FALSE) {
+nixmass <- function(data, model = c("delta.snow", "jo09", "pi16", "st10", "gu19"), alt, region.jo09, region.gu19, snowclass.st10, return_full = FALSE, verbose = FALSE) {
    
   model <- match.arg(model, several.ok = TRUE)
   if(length(model) == 0) 
@@ -124,7 +127,7 @@ nixmass <- function(data, model = c("delta.snow","jo09","pi16","st10","gu19"), a
   swe <- list()
   for(m in model){
    if(m == "delta.snow"){
-     swe[["swe"]][[m]] <- swe.delta.snow(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.0005104722, k.ov=0.37856737, k=0.02993175, tau=0.02362476, eta.null=8523356, timestep=24, verbose)
+     swe[["swe"]][[m]] <- swe.delta.snow(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.0005104722, k.ov=0.37856737, k=0.02993175, tau=0.02362476, eta.null=8523356, timestep=24, return_full, verbose)
    } else if (m == "jo09"){
      swe[["swe"]][[m]] <- swe.jo09(data, alt, region.jo09)
    } else if (m == "pi16"){
@@ -154,12 +157,12 @@ nixmass <- function(data, model = c("delta.snow","jo09","pi16","st10","gu19"), a
 #' @export
 summary.nixmass <- function(object, ...){
   
-  if(class(object) != "nixmass")
-    stop("nixmass: Object must be of class 'nixmass'.")
+  if (!inherits(object, "nixmass"))
+    stop("Object must be of class 'nixmass'.")
   
   models <- names(object$swe)
   if(length(models) == 0)
-    stop("nixmass: Cannot print anything. No model was computed.")
+    stop("Cannot print anything. No model was computed.")
   
   l <- lapply(object$swe,quantile, na.rm=T)
   lm <- lapply(object$swe,mean, na.rm=T)
@@ -186,12 +189,12 @@ summary.nixmass <- function(object, ...){
 #' @export
 plot.nixmass <- function(x, title = NULL, ...){
   
-  if(class(x) != "nixmass")
-    stop("nixmass: Object must be of class 'nixmass'.")
+  if (!inherits(x, "nixmass"))
+    stop("Object must be of class 'nixmass'.")
   
   models <- names(x$swe)
   if(length(models) == 0)
-    stop("nixmass: Cannot plot. No model was computed.")
+    stop("Cannot plot. No model was computed.")
   
   colors <- c("#E16A86","#C18500","#799D00","#00AB6E","#00A9BE","#6C8EE6","#D169D0")
   

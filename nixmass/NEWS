@@ -1,7 +1,19 @@
-nixmass v1.0-2 (released ate: 2021-03-05)
+nixmass v1.1-2 (release date: XXXXXXXX)
+=========================================
+     
+Changes: 
+
+* In a new version of the delta.snow model, the maximum density of the snow pack depends on layer age.
+* The complete matrix of layer-wise snow depth, swe and age values can now be returned on demand. 
+* Stability in terms of failure tests has been strongly improved.
+
+
+nixmass v1.0-2 (release date: 2021-03-05)
 =========================================
      
 Changes: 
 
 * Large preallocated matrices for keeping track of the main variables have been replaced by small matrices. They comprise of only three timesteps, i.e. timestep - 1, timestep, and timestep + 1. This makes computation much faster, and there is no more restriction of the data series length.
 * The summary function has now a prettier output.
+
+

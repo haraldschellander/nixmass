@@ -2,7 +2,7 @@
 % Please edit documentation in R/nixmass.R
 \name{nixmass}
 \alias{nixmass}
-\title{SWE modeling with the delta.snow process based model and several emprical regression models.}
+\title{SWE modeling with the delta.snow process based model and several empirical regression models.}
 \usage{
 nixmass(
   data,
@@ -11,6 +11,7 @@ nixmass(
   region.jo09,
   region.gu19,
   snowclass.st10,
+  return_full = FALSE,
   verbose = FALSE
 )
 }
@@ -37,7 +38,11 @@ the station belongs to, according to Fig. 1 in the original reference.}
 
 \item{snowclass.st10}{Must be given if one of model is \code{"st10"}. 
 Must be one of the following character strings: 
-"alpine","maritime","prairie","tundra","taiga" as outlined in the original reference.}
+"alpine", "maritime", "prairie", "tundra", "taiga" as outlined in the original reference.}
+
+\item{return_full}{If TRUE, also modeled snow depth and the daily, layerwise matrices of swe, 
+snow depth and age are returned. Defaults to FALSE. Is only used 
+for the delta.snow model (see \code{\link{swe.delta.snow}}).}
 
 \item{verbose}{Logical. Should additional information be given during runtime?}
 }
@@ -66,7 +71,7 @@ does not exist any restriction regarding the length of the data.
 \examples{
 ## Load example data with realistic snow depth values 
 data("hsdata")
-o <- nixmass(hsdata, model="delta.snow",verbose=TRUE)
+o <- nixmass(hsdata, model = "delta.snow", verbose = TRUE)
 plot(o)
 
 o1 <- nixmass(hsdata, alt=600, region.jo09=6, region.gu19 = "central",

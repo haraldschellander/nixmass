@@ -14,18 +14,21 @@ swe.delta.snow(
   tau = 0.02362476,
   eta.null = 8523356,
   timestep = 24,
+  return_full = FALSE,
   verbose = FALSE
 )
 }
 \arguments{
 \item{data}{A data.frame with at least two columns named \code{date} and \code{hs}. 
 They should contain date and corresponding daily observations of snow depth \eqn{hs \ge 0} 
-measured at one site. The unit must be meters (m). No gaps or NA are allowed.}
+measured at one site. The unit must be meters (m). No gaps or NA are allowed.
+Dates must be given in the format \code{YYYY-MM-DD}, no sub-daily resolution is allowed at the moment (see details).}
 
 \item{rho.max}{Maximum density of an individual snow layer produced by 
-the deltasnow model [kg/m3], \eqn{rho.max > 0}}
+the delta.snow model [kg/m3], \eqn{rho.max > 0}}
 
-\item{rho.null}{Fresh snow density for a newly created layer [kg/m3], \eqn{rho.null > 0}.}
+\item{rho.null}{Fresh snow density for a newly created layer [kg/m3], \eqn{rho.null > 0}. 
+Currently optimised for daily snow depth observations.}
 
 \item{c.ov}{Overburden factor due to fresh snow [-], \eqn{c.ov > 0}}
 
@@ -38,12 +41,18 @@ compaction due to overburden [-], \eqn{k.ov \in [0,1]}.}
 
 \item{eta.null}{Effective compactive viscosity of snow for "zero-density" [Pa s].}
 
-\item{timestep}{Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.}
+\item{timestep}{Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.
+No sub-daily values are allowed at the moment (see details).}
+
+\item{return_full}{If TRUE, also modeled snow depth and the daily, layerwise matrices of swe, 
+snow depth and age are returned (see details). Defaults to FALSE.}
 
 \item{verbose}{Should additional information be given during runtime? Can be \code{TRUE} or \code{FALSE}.}
 }
 \value{
-A vector with daily SWE values in mm.
+Either a vector with daily SWE values in mm. Or, if \code{return_full=TRUE}, a list with two elements is returned. 
+The first element holds a tibble with the observation date, observed snow depths and modeled swe. 
+The second element returns a tibble with modeled snow depth (h), modeled swe (swe) and age of each layer at each observation date.
 }
 \description{
 Model daily values of Snow Water Equivalent solely from daily differences of snow depth.
@@ -58,6 +67,35 @@ respective density of layer i, the gravitational acceleration
 \eqn{g = 9.8ms^{-2}}, viscosity \eqn{\eta_0} [Pa] and 
 factor \eqn{k2 [m^3kg^{-1}}], determining the importance 
 of today's for tomorrow's density.
+
+In principal, the model is able to cope with a sub-daily temporal resolution, 
+e.g. hourly snow depth observations. However, the model was fitted to daily observations, 
+and the model parameter \code{rho.null} reflects that. In other words, if the observation frequency decreases, 
+ \code{rho.null} should change as well. Currently, no sub-daily resolution is allowed.
+
+Setting the option \code{return_full=TRUE}, the complete matrix of layer-wise snow depth, swe and age 
+values can be returned. It can be used to produce plots of the temporal density evolution.
+}
+\examples{
+data(hsdata)
+
+# simple output 
+swe <- swe.delta.snow(hsdata)
+rho <- swe / hsdata$hs
+summary(rho)
+
+# return internal matrices
+res <- swe.delta.snow(hsdata, return_full = TRUE)
+res$matrices
+
+# how many layers does the snowpack have at most? 
+length(grep("ly", colnames(res$matrices)))
+
+# how old is the oldest layer?
+library(dplyr)
+lyrs <- res$matrices |> filter(param == "age") |> dplyr::select(starts_with("ly"))
+sapply(lyrs, max)
+
 }
 \references{
 Gruber, S. (2014) "Modelling snow water equivalent based on daily snow depths", Masterthesis, Institute for Atmospheric and Cryospheric Sciences, University of Innsbruck.
