@@ -3,7 +3,8 @@ nixmass v1.0-3 (release date: 2024-06-11)
      
 Changes: 
 
-* Switched to Roxygen for packaeg management.
+* Date coumsn in data objects can now be of either of class `character`, `Date` or `POSIXct`.
+* Switched to Roxygen for package management.
 * Stability in terms of failure tests has been strongly improved.
 
 
