@@ -11,3 +11,10 @@ Encoding: UTF-8
 
 RnwWeave: knitr
 LaTeX: pdfLaTeX
+
+BuildType: Package
+PackageUseDevtools: Yes
+PackagePath: C:/Users/hschellander/Documents/local_projects/r-packages/nixmass/nixmass
+PackageInstallArgs: --no-multiarch --with-keep.source
+PackageCheckArgs: --as-cran
+PackageRoxygenize: rd,collate,namespace
