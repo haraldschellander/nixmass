@@ -155,8 +155,21 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
   #---------------------------------------------------------------------
   # parameter checks
   
+  if (dyn_rho_max) {
+    if (model_opts$sigma <= 0)
+      stop("'sigma' must not be negative or 0")  
+    if (model_opts$mu <= 0)
+      stop("'mu' must not be negative or 0")  
+    if (model_opts$rho_h <= 0)
+      stop("'rho_h' must not be negative or 0")  
+    if (model_opts$rho_l <= 0)
+      stop("'rho_l' must not be negative or 0")  
+  } else {
   if (model_opts$rho.max <= 0)
     stop("'rho.max' must not be negative or 0")
+  }
+  
+  
   if (model_opts$rho.null <= 0)
     stop("'rho.null' must not be negative or 0")
   if (model_opts$c.ov <= 0)
@@ -448,15 +461,6 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
   
   
   if(verbose){
-    # cat("Using parameters:\n",
-    #     "rho.max  =",model_opts$rho.max,"\n",
-    #     "rho.null =",model_opts$rho.null,"\n",
-    #     "c.ov     =",model_opts$c.ov,"\n",
-    #     "k.ov     =",model_opts$k.ov,"\n",
-    #     "k        =",model_opts$k,"\n",
-    #     "tau      =",model_opts$tau,"\n",
-    #     "eta.null =",model_opts$eta.null,"\n"
-    # )
     cat("Using parameters:\n")
     print(unlist(model_opts))
   }

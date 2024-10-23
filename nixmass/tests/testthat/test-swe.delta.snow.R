@@ -94,48 +94,69 @@ test_that("swe.delta.snow", {
           })
           
           # parameter checks
+          mock_data <- data.frame(date = c("2024-01-01", "2024-01-02"), hs = c(0, 1))     
+          it ("should throw an error if 'sigma` is negative or 0", {
+               expect_error(swe.delta.snow(mock_data, model_opts = list(sigma = 0)), "'sigma' must not be negative or 0")
+          })
+          
+          it ("should throw an error if 'mu` is negative or 0", {
+               expect_error(swe.delta.snow(mock_data, model_opts = list(mu = 0)), "'mu' must not be negative or 0")
+          })
+          
+          it ("should throw an error if 'rho_h` is negative or 0", {
+               expect_error(swe.delta.snow(mock_data, model_opts = list(rho_h = 0)), "'rho_h' must not be negative or 0")
+          })
+          
+          it ("should throw an error if 'rho_l` is negative or 0", {
+               expect_error(swe.delta.snow(mock_data, model_opts = list(rho_l = 0)), "'rho_l' must not be negative or 0")
+          })
+          
           it ("should throw an error if 'rho.max' is negative or 0", {
-               data <- data.frame(date = c("2024-01-01", "2024-01-02"), hs = c(0, 1))
-               expect_error(swe.delta.snow(data, rho.max = 0), "'rho.max' must not be negative or 0")
+               expect_error(swe.delta.snow(mock_data, model_opts = list(rho.max = 0), dyn_rho_max = FALSE), "'rho.max' must not be negative or 0")
           })
           it ("should throw an error if 'rho.null' is negative or 0", {
-               data <- data.frame(date = c("2024-01-01", "2024-01-02"), hs = c(0, 1))
-               expect_error(swe.delta.snow(data, rho.null = 0), "'rho.null' must not be negative or 0")
+               expect_error(swe.delta.snow(mock_data, model_opts = list(rho.null = 0)), "'rho.null' must not be negative or 0")
           })
           it ("should throw an error if 'k.ov' < 0", {
-               data <- data.frame(date = c("2024-01-01", "2024-01-02"), hs = c(0, 1))
-               expect_error(swe.delta.snow(data, k.ov = -1), "'k.ov' must be > 0")
+               expect_error(swe.delta.snow(mock_data, model_opts = list(k.ov = -1)), "'k.ov' must be > 0")
           })
           it ("should throw an error if 'k.ov' > 1", {
-               data <- data.frame(date = c("2024-01-01", "2024-01-02"), hs = c(0, 1))
-               expect_error(swe.delta.snow(data, k.ov = 10), "'k.ov' must be < 1")
+               expect_error(swe.delta.snow(mock_data, model_opts = list(k.ov = 10)), "'k.ov' must be < 1")
           })
           it ("should throw an error if 'k' is negative or 0", {
-               data <- data.frame(date = c("2024-01-01", "2024-01-02"), hs = c(0, 1))
-               expect_error(swe.delta.snow(data, k = 0), "'k' must not be negative or 0")
+               expect_error(swe.delta.snow(mock_data, model_opts = list(k = 0)), "'k' must not be negative or 0")
           })
           it ("should throw an error if 'tau' is negative or 0", {
-               data <- data.frame(date = c("2024-01-01", "2024-01-02"), hs = c(0, 1))
-               expect_error(swe.delta.snow(data, tau = 0), "'tau' must not be negative or 0")
+               expect_error(swe.delta.snow(mock_data, model_opts = list(tau = 0)), "'tau' must not be negative or 0")
           })
           it ("should throw an error if timestep does not fit to data", {
                data <- data.frame(date = c("2024-01-01", "2024-01-02", "2024-01-03"), hs = c(0, 1, 0))
-               expect_error(swe.delta.snow(data, timestep = 48), "provided timestep does not fit your data")
+               expect_error(swe.delta.snow(data, model_opts = list(timestep = 48)), "provided timestep does not fit your data")
                # data <- data.frame(date = c("2024-01-01 01:00", "2024-01-01 02:00", "2024-01-01 03:00"), hs = c(0, 20, 0))
                # expect_error(swe.delta.snow(data, timestep = 12), "provided timestep does not fit your data")
                
           }) 
           it ("should throw an error if timestep is less than 24 hours", {
                data <- data.frame(date = c("2024-01-01", "2024-01-02"), hs = c(0, 0))
-               expect_error(swe.delta.snow(data, timestep = 1), "timestep must be >= 24 hours")
+               expect_error(swe.delta.snow(data, model_opts = list(timestep = 1)), "timestep must be >= 24 hours")
           })
           
-          it ("should correctly calculate SWE values", {
+          it ("should correctly calculate SWE values with constant maximum density", {
                # Setup a mock dataset
                sample_dates <- seq.Date(from = as.Date("2000-11-01"), to = as.Date("2000-11-07"), by = 1)
                sample_data <- c(0, seq(0.1, 0.5, 0.1), 0)
                data <- data.frame(date = as.character(sample_dates), hs = sample_data)
-               result <- swe.delta.snow(data)
+               result <- swe.delta.snow(data, dyn_rho_max = FALSE)
+               expect_true(all(result >= 0))
+               expect_true(length(result) == nrow(data))
+          })
+          
+          it ("should correctly calculate SWE values with increasing maximum density", {
+               # Setup a mock dataset
+               sample_dates <- seq.Date(from = as.Date("2000-11-01"), to = as.Date("2000-11-07"), by = 1)
+               sample_data <- c(0, seq(0.1, 0.5, 0.1), 0)
+               data <- data.frame(date = as.character(sample_dates), hs = sample_data)
+               result <- swe.delta.snow(data, dyn_rho_max = TRUE)
                expect_true(all(result >= 0))
                expect_true(length(result) == nrow(data))
           })
