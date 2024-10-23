@@ -97,17 +97,9 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
   
   if (dyn_rho_max) {
     model_opts_defaults <- list(
-      sigma = 0.02986102,
-      mu = 148.3291,
-      rho_h = 588.6178,
-      rho_l = 369.0934,
-      rho.null = 80.73706,
-      c.ov = 0.0005170964,
-      k.ov = 0.3782312,
-      k = 0.029297,
-      tau = 0.02356521,
-      eta.null = 8543502,
-      timestep = 24
+      sigma = 0.02986102, mu = 148.3291, rho_h = 588.6178, rho_l = 369.0934,
+      rho.null = 80.73706, c.ov = 0.0005170964, k.ov = 0.3782312,
+      k = 0.029297, tau = 0.02356521, eta.null = 8543502, timestep = 24
     )
   } else {
     model_opts_defaults <- list(
@@ -116,7 +108,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
     )   
   }
   model_opts <- utils::modifyList(model_opts_defaults, model_opts)
-   print(model_opts)
+  
  
   #---------------------------------------------------------------------
   # general checks
@@ -456,18 +448,18 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
   
   
   if(verbose){
-    cat("Using parameters:\n",
-        "rho.max  =",model_opts$rho.max,"\n",
-        "rho.null =",model_opts$rho.null,"\n",
-        "c.ov     =",model_opts$c.ov,"\n",
-        "k.ov     =",model_opts$k.ov,"\n",
-        "k        =",model_opts$k,"\n",
-        "tau      =",model_opts$tau,"\n",
-        "eta.null =",model_opts$eta.null,"\n"
-    )
+    # cat("Using parameters:\n",
+    #     "rho.max  =",model_opts$rho.max,"\n",
+    #     "rho.null =",model_opts$rho.null,"\n",
+    #     "c.ov     =",model_opts$c.ov,"\n",
+    #     "k.ov     =",model_opts$k.ov,"\n",
+    #     "k        =",model_opts$k,"\n",
+    #     "tau      =",model_opts$tau,"\n",
+    #     "eta.null =",model_opts$eta.null,"\n"
+    # )
+    cat("Using parameters:\n")
+    print(unlist(model_opts))
   }
-  
-  
   
   for (t in 1:day.tot) {
     
