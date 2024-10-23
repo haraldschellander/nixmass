@@ -1,4 +1,4 @@
-utils::globalVariables(c("hs", "param", "ti"))
+utils::globalVariables(c("hs"))
 
 #' SWE modeling from daily snow depth differences
 #' 
@@ -62,10 +62,34 @@ utils::globalVariables(c("hs", "param", "ti"))
 #' summary(rho)
 #' 
 #' 
-swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov = 0.0005104722, 
-                           k.ov = 0.37856737, k = 0.02993175, tau = 0.02362476, eta.null = 8523356, timestep = 24, 
-                           verbose = FALSE) {
+# swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov = 0.0005104722, 
+#                            k.ov = 0.37856737, k = 0.02993175, tau = 0.02362476, eta.null = 8523356, timestep = 24, 
+#                            verbose = FALSE) {
+swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbose = FALSE) {
   
+  if (dyn_rho_max) {
+    model_opts_defaults <- list(
+      sigma = 0.02986102,
+      mu = 148.3291,
+      rho_h = 588.6178,
+      rho_l = 369.0934,
+      rho.null = 80.73706,
+      c.ov = 0.0005170964,
+      k.ov = 0.3782312,
+      k = 0.029297,
+      tau = 0.02356521,
+      eta.null = 8543502,
+      timestep = 24
+    )
+  } else {
+    model_opts_defaults <- list(
+      rho.max = 401.2588, rho.null = 81.19417, c.ov = 0.0005104722,
+      k.ov = 0.37856737, k = 0.02993175, tau = 0.02362476, eta.null = 8523356, timestep = 24
+    )   
+  }
+  model_opts <- utils::modifyList(model_opts_defaults, model_opts)
+   print(model_opts)
+ 
   #---------------------------------------------------------------------
   # general checks
   
@@ -111,26 +135,26 @@ swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov =
   #---------------------------------------------------------------------
   # parameter checks
   
-  if (rho.max <= 0)
+  if (model_opts$rho.max <= 0)
     stop("'rho.max' must not be negative or 0")
-  if (rho.null <= 0)
+  if (model_opts$rho.null <= 0)
     stop("'rho.null' must not be negative or 0")
-  if (c.ov <= 0)
+  if (model_opts$c.ov <= 0)
     stop("'c.ov' must not be negative or 0")
-  if (k.ov < 0)
+  if (model_opts$k.ov < 0)
     stop("'k.ov' must be > 0")
-  if (k.ov > 1)
+  if (model_opts$k.ov > 1)
     stop("'k.ov' must be < 1")
-  if (k <= 0)
+  if (model_opts$k <= 0)
     stop("'k' must not be negative or 0")
-  if (tau <= 0)
+  if (model_opts$tau <= 0)
     stop("'tau' must not be negative or 0")
   
   # check timestep vs data
-  if (timestep < 24)
+  if (model_opts$timestep < 24)
     stop("timestep must be >= 24 hours")
   d_secs <- abs(as.numeric(as.POSIXct(data$date[2])) - as.numeric(as.POSIXct(data$date[1])))
-  if (d_secs / 60 / 60  != timestep) 
+  if (d_secs / 60 / 60  != model_opts$timestep) 
     stop("provided timestep does not fit your data")
   
   
@@ -141,7 +165,7 @@ swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov =
   H        <- numeric(length = length(Hobs))    # modeled total depth of snow at any day [m]
   SWE      <- numeric(length = length(Hobs))    # modeled total SWE at any day [kg/m2]
   ly       <- 1                                 # layer number [-]
-  ts       <- timestep * 3600                   # timestep between observations [s]
+  ts       <- model_opts$timestep * 3600                   # timestep between observations [s]
   g        <- 9.81                              # gravity [ms-2]
   
   # preallocate some variables   
@@ -174,7 +198,7 @@ swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov =
     snowpack.d   <- data.frame(h  = h.d, swe = swe.d, swe.hat = swe.hat.d, age = age.d)
     H.d          <- sum(snowpack.d$h)
     
-    a <- data.frame(t(apply(snowpack.d[(1:ly),], 1, compactH, H.d, k, rho.max, ts, prec, g, eta.null)))
+    a <- data.frame(t(apply(snowpack.d[(1:ly),], 1, compactH, H.d, k, rho.max, ts, prec, g, model_opts$eta.null)))
     b <- data.frame(rep(0,ly.tot-ly),rep(0,ly.tot-ly),rep(0,ly.tot-ly),rep(0,ly.tot-ly))
     colnames(a) <- colnames(b) <- c("h","swe","age","rho")
     nixmass.e$snowpack.dd <<- rbind(a,b)
@@ -405,13 +429,13 @@ swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov =
   
   if(verbose){
     cat("Using parameters:\n",
-        "rho.max  =",rho.max,"\n",
-        "rho.null =",rho.null,"\n",
-        "c.ov     =",c.ov,"\n",
-        "k.ov     =",k.ov,"\n",
-        "k        =",k,"\n",
-        "tau      =",tau,"\n",
-        "eta.null =",eta.null,"\n"
+        "rho.max  =",model_opts$rho.max,"\n",
+        "rho.null =",model_opts$rho.null,"\n",
+        "c.ov     =",model_opts$c.ov,"\n",
+        "k.ov     =",model_opts$k.ov,"\n",
+        "k        =",model_opts$k,"\n",
+        "tau      =",model_opts$tau,"\n",
+        "eta.null =",model_opts$eta.null,"\n"
     )
   }
   
@@ -452,12 +476,12 @@ swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov =
         age[ly,2] <- 1
         h[ly,2]   <- Hobs[t]
         H[t]      <- Hobs[t]
-        swe[ly,2] <- rho.null * Hobs[t]
+        swe[ly,2] <- model_opts$rho.null * Hobs[t]
         SWE[t]    <- swe[ly,2]
         ly.tot    <- nrow(h)
         
         # compact actual day 
-        snowpack.tomorrow <- dry_compaction(h[,2], swe[,2], age[,2], ly.tot, ly, k, rho.max, ts, prec, g)
+        snowpack.tomorrow <- dry_compaction(h[,2], swe[,2], age[,2], ly.tot, ly, model_opts$k, model_opts$rho.max, ts, prec, g)
         
         # set values for next day
         rl  <- assignH(snowpack.tomorrow, h, swe, age, H, SWE, t, day.tot)
@@ -473,11 +497,11 @@ swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov =
         
         deltaH <- Hobs[t] - H[t]
         
-        if( deltaH > tau ){
+        if( deltaH > model_opts$tau ){
           if (verbose) msg(m,t,paste("create new layer",ly+1))
           
-          sigma.null <- deltaH * rho.null * g
-          epsilon <- c.ov * sigma.null * exp(-k.ov * nixmass.e$snowpack.dd$rho/(rho.max - nixmass.e$snowpack.dd$rho))
+          sigma.null <- deltaH * model_opts$rho.null * g
+          epsilon <- model_opts$c.ov * sigma.null * exp(-model_opts$k.ov * nixmass.e$snowpack.dd$rho/(model_opts$rho.max - nixmass.e$snowpack.dd$rho))
           
           h[,2]         <- (1 - epsilon) * h[,2]
           swe[,2]       <- swe[,1]
@@ -491,7 +515,7 @@ swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov =
           age           <- rbind(age,rep(0,3))   
           ly            <- ly + 1
           h[ly,2]       <- Hobs[t] - H[t]
-          swe[ly,2]     <- rho.null * h[ly,2]
+          swe[ly,2]     <- model_opts$rho.null * h[ly,2]
           age[ly,2]     <- 1
           
           # recompute
@@ -500,7 +524,7 @@ swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov =
           ly.tot        <- nrow(h)
           
           # compact actual day 
-          snowpack.tomorrow <- dry_compaction(h[,2], swe[,2], age[,2], ly.tot, ly, k, rho.max, ts, prec, g)
+          snowpack.tomorrow <- dry_compaction(h[,2], swe[,2], age[,2], ly.tot, ly, model_opts$k, model_opts$rho.max, ts, prec, g)
           
           # set values for next day
           rl  <- assignH(snowpack.tomorrow, h, swe, age, H, SWE, t, day.tot)
@@ -511,20 +535,20 @@ swe.delta.snow <- function(data, rho.max = 401.2588, rho.null = 81.19417, c.ov =
           SWE <- rl$SWE
           
           # no mass gain or loss, but scaling
-        } else if( deltaH >= -tau & deltaH <= tau ) {
+        } else if( deltaH >= -model_opts$tau & deltaH <= model_opts$tau ) {
           if (verbose) msg(m,t,paste("scaling: "))
           ly.tot <- nrow(h)
-          rl  <- scaleH(t, ly, ly.tot, day.tot, deltaH, Hobs, h, swe, age, H, SWE, rho.max, k, ts, prec, m)
+          rl  <- scaleH(t, ly, ly.tot, day.tot, deltaH, Hobs, h, swe, age, H, SWE, model_opts$rho.max, model_opts$k, ts, prec, m)
           h   <- rl$h
           swe <- rl$swe
           age <- rl$age
           H   <- rl$H
           SWE <- rl$SWE
           
-        } else if ( deltaH < -tau ){
+        } else if ( deltaH < -model_opts$tau ){
           if (verbose) msg(m,t,paste("drenching: "))
           ly.tot <- nrow(h)
-          rl  <- drenchH(t, ly, ly.tot, day.tot, Hobs, h, swe, age, H, SWE, rho.max, c.ov, k.ov, k, ts, prec, m)
+          rl  <- drenchH(t, ly, ly.tot, day.tot, Hobs, h, swe, age, H, SWE, model_opts$rho.max, model_opts$c.ov, model_opts$k.ov, model_opts$k, ts, prec, m)
           h   <- rl$h
           swe <- rl$swe
           age <- rl$age
