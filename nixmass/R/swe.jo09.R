@@ -1,3 +1,31 @@
+#' Statistical SWE modeling depending on month and climatic region in Switzerland
+#'
+#' Snow Water Equivalent (SWE) is modeled statistically depending on snow depth, altitude, date and region in Switzerland.
+#' 
+#' @param data A data.frame of daily observations with two columns named \emph{date} and \emph{hs} 
+#' referring to day and snow depth at that day. The date column must be either of class `character`, `Date` or `POSIXct` 
+#' with the format \code{YYYY-MM-DD}. The hs column must be snow depth values \eqn{\ge 0} in m. 
+#' @param alt Station elevation in meters.
+#' @param region.jo09 Integer number of the Swiss region where the station belongs to, 
+#' according to Fig. 1 in the original reference. Must be one of 1,2,3,4,5,6,7.
+#'
+#' @details
+#' \code{swe.jo09}{ This model parametrizes bulk snow density using snow depth, 
+#' season (i.e. month), site altitude and site location. The location is implemented by a 
+#' density offset according to the region in Switzerland, where the station belongs to. 
+#' Non computable values are returned as NA.}
+#' 
+#' @return A nuemric vector with SWE values for each region in mm.
+#' @export
+#'
+#' @references
+#' Jonas, T., Marty, C. and Magnusson, J. (2009) 'Estimating the snow water equivalent from snow depth measurements in the Swiss Alps', Journal of Hydrology, 378(1 - 2), pp. 161 - 167. doi: 10.1016/j.jhydrol.2009.09.021.
+#' 
+#' @examples
+#' data(hsdata)
+#' swe <- swe.jo09(hsdata, 1500, 1)
+#' summary(swe) 
+#' plot(swe)
 swe.jo09 <- function(data, alt, region.jo09){
   # hs must be in [m]
   
@@ -15,10 +43,20 @@ swe.jo09 <- function(data, alt, region.jo09){
   if(!is.numeric(Hobs))
     stop("swe.jo09: snow depth data must be numeric")
   
-  if(!inherits(data$date,"character"))
-    stop("swe.jo09: date column must be of class character")
+  if (inherits(data$date, "character")) {
+    if (any(is.na(as.POSIXlt(data$date, format = "%Y-%m-%d")))) {
+      stop("date format must be '%Y-%m-%d'") 
+    } else {
+      data$date <- as.Date(data$date)
+    }
+  } else if (inherits(data$date, "Date") | inherits(data$date, "POSIXct")) {
+    if (any(is.na(as.POSIXlt(data$date, format = "%Y-%m-%d"))))
+      stop("date format must be '%Y-%m-%d'") 
+  } else {
+    stop("date column must be either of class 'character', 'Date' or 'POSIXct'")
+  }
   
- # z <- zoo(Hobs,as.Date(data$date))
+  # z <- zoo(Hobs,as.Date(data$date))
   #if(!is.regular(z, strict = TRUE))
   #  stop("swe.jo09: date column must be strictly regular")
   
@@ -39,6 +77,8 @@ swe.jo09 <- function(data, alt, region.jo09){
     stop("swe.jo09: region.jo09 must be given")
   if (!is.element(region.jo09,1:7))
     stop("swe.jo09: region.jo09 must be integer between 1 and 7")
+  if (length(region.jo09) > 1)
+    stop("region.jo09 must be of length one")
   
   #-----------------------------------------------------------------------
   # Station altitude vs month of observation
