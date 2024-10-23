@@ -4,71 +4,83 @@
 \alias{swe.delta.snow}
 \title{SWE modeling from daily snow depth differences}
 \usage{
-swe.delta.snow(
-  data,
-  rho.max = 401.2588,
-  rho.null = 81.19417,
-  c.ov = 0.0005104722,
-  k.ov = 0.37856737,
-  k = 0.02993175,
-  tau = 0.02362476,
-  eta.null = 8523356,
-  timestep = 24,
-  verbose = FALSE
-)
+swe.delta.snow(data, model_opts = list(), dyn_rho_max = TRUE, verbose = FALSE)
 }
 \arguments{
-\item{data}{A data.frame with at least two columns named \code{date} and \code{hs}. 
-They should contain date and corresponding daily observations of snow depth \eqn{hs \ge 0} 
+\item{data}{A data.frame with at least two columns named \code{date} and \code{hs}.
+They should contain date and corresponding daily observations of snow depth \eqn{hs \ge 0}
 measured at one site. The unit must be meters (m). No gaps or NA are allowed.
-Dates must be either of class `character`, `Date` or `POSIXct` and given in the format 
+Dates must be either of class \code{character}, \code{Date} or \code{POSIXct} and given in the format
 \code{YYYY-MM-DD}. No sub-daily resolution is allowed at the moment (see details).}
 
-\item{rho.max}{Maximum density of an individual snow layer produced by 
-the delta.snow model [kg/m3], \eqn{rho.max > 0}}
+\item{model_opts}{An empty list which can be populated with model coefficients
+specific to the original delta.snow model (Winkler et al., 2021) or a version, where
+the maximum layer and bulk snow densities are allowed to vary with age (see details).}
 
-\item{rho.null}{Fresh snow density for a newly created layer [kg/m3], \eqn{rho.null > 0}. 
-Currently optimised for daily snow depth observations.}
-
-\item{c.ov}{Overburden factor due to fresh snow [-], \eqn{c.ov > 0}}
-
-\item{k.ov}{Defines the impact of the individual layer density on the 
-compaction due to overburden [-], \eqn{k.ov \in [0,1]}.}
-
-\item{k}{Exponent of the exponential-law compaction [m3/kg], \eqn{k > 0}.}
-
-\item{tau}{Uncertainty bound [m], \eqn{tau > 0}.}
-
-\item{eta.null}{Effective compactive viscosity of snow for "zero-density" [Pa s].}
-
-\item{timestep}{Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.
-No sub-daily values are allowed at the moment (see details).}
+\item{dyn_rho_max}{Logical. If \code{TRUE}, the maximum bulk snow density is allowed to vary with layer age (see details).
+if \code{FALSE}, the original delta.snow model is used.}
 
 \item{verbose}{Should additional information be given during runtime? Can be \code{TRUE} or \code{FALSE}.}
 }
 \value{
-Either a vector with daily SWE values in mm. Or, if \code{return_full=TRUE}, a list with two elements is returned. 
-The first element holds a tibble with the observation date, observed snow depths and modeled swe. 
-The second element returns a tibble with modeled snow depth (h), modeled swe (swe) and age of each layer at each observation date.
+A vector with daily SWE values in mm.
 }
 \description{
 Model daily values of Snow Water Equivalent solely from daily differences of snow depth.
 
-\code{swe.delta.snow} computes SWE solely from daily changes of snow depth 
+\code{swe.delta.snow} computes SWE solely from daily changes of snow depth
 at an observation site. \cr
-Compression of a snow layer without additional load on top is computed on 
+Compression of a snow layer without additional load on top is computed on
 the basis of Sturm and Holmgren (1998), who regard snow as a viscous fluid: \cr
 \deqn{\rho_i(t_{i+1}) = \rho_i(t_i)*(1+(SWE*g)/\eta_0 * exp^{-k_2*\rho_i(t_i)})}
-with \eqn{\rho_i(t_{i+1}) and \rho_i(t_i)} being tomorrow's and today's 
-respective density of layer i, the gravitational acceleration 
-\eqn{g = 9.8ms^{-2}}, viscosity \eqn{\eta_0} [Pa] and 
-factor \eqn{k2 [m^3kg^{-1}}], determining the importance 
+with \eqn{\rho_i(t_{i+1}) and \rho_i(t_i)} being tomorrow's and today's
+respective density of layer i, the gravitational acceleration
+\eqn{g = 9.8ms^{-2}}, viscosity \eqn{\eta_0} \link{Pa} and
+factor \eqn{k2 [m^3kg^{-1}}], determining the importance
 of today's for tomorrow's density.
+}
+\details{
+In principal, the model is able to cope with a sub-daily temporal resolution,
+e.g. hourly snow depth observations. However, the model was fitted to daily observations,
+and the model parameter \code{rho.null} reflects that. In other words, if the observation frequency decreases,
+\code{rho.null} should change as well. Currently, no sub-daily resolution is allowed.
 
-In principal, the model is able to cope with a sub-daily temporal resolution, 
-e.g. hourly snow depth observations. However, the model was fitted to daily observations, 
-and the model parameter \code{rho.null} reflects that. In other words, if the observation frequency decreases, 
- \code{rho.null} should change as well. Currently, no sub-daily resolution is allowed.
+If \code{dyn_rho_max = TRUE}, the bulk snow density varies with layer age. As activation function,
+\code{atan} is used. In that case, \code{model_opts} are extended by a lower density bound \code{rho_l},
+an upper density bound \code{rho_h}, a slope \code{sigma} and a midpoint \code{mu},
+where the S-curve symmetrically transitions from the lower to the upper density bound.
+Be aware that also the other model coefficients do slightly change.
+
+The following model coefficients must be provided:
+
+\code{dyn_rho_max=FALSE}:
+\itemize{
+\item \code{rho.max} Maximum density of an individual snow layer produced by
+the delta.snow model (kg/m3), \eqn{rho.max > 0}
+\item \code{rho.null} Fresh snow density for a newly created layer (kg/m3), \eqn{rho.null > 0}.
+Currently optimised for daily snow depth observations.
+\item \code{c.ov} Overburden factor due to fresh snow (-), \eqn{c.ov > 0}
+\item \code{k.ov} Defines the impact of the individual layer density on the
+compaction due to overburden (-), \eqn{k.ov \in [0,1]}.
+\item \code{k} Exponent of the exponential-law compaction (m3/kg), \eqn{k > 0}.
+\item \code{tau} Uncertainty bound (m), \eqn{tau > 0}.
+\item \code{eta.null} Effective compactive viscosity of snow for "zero-density" (Pa s).
+\item \code{timestep} Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.
+No sub-daily values are allowed at the moment (see details).
+}
+
+\code{dy_rho_max=TRUE}:
+
+Instead of a constant coefficient for \code{rho.max}, these four
+parameters describe the smooth s-curve approximated by the \code{atan}trigonometric function.
+\itemize{
+\item \code{sigma} Steepness or slope of \code{atan} at its midpoint \code{mu}, (-), \eqn{sigma > 0}.
+\item \code{mu} Central midpoint in days, where the steepest transition occurs (days), \eqn{mu > 0}.
+\item \code{rho_h} Upper density bound for a single layer and the whole snow pack (kg/m3), \eqn{rho_h > 0}.
+\item \code{rho_l} Lower density bound for a single layer and the whole snow pack, where the transition begins
+(kg/m3), \eqn{rho_l > 0}.
+All other coefficients are needed as well. Be aware however that they are slightly different.
+}
 }
 \examples{
 data(hsdata)
@@ -87,6 +99,8 @@ Martinec, J., Rango, A. (1991) "Indirect evaluation of snow reserves in mountain
 Sturm, M., Holmgren, J. (1998) "Differences in compaction behavior of three climate classes of snow". Annals of Glaciology 26, 125-130.
 \cr\cr
 Winkler, M., Schellander, H., and Gruber, S.: Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021, 2021.
+\cr\cr
+Schroeder, M.et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
 }
 \author{
 Harald Schellander, Michael Winkler
