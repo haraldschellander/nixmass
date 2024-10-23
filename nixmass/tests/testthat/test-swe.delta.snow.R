@@ -161,8 +161,5 @@ test_that("swe.delta.snow", {
                expect_true(length(result) == nrow(data))
           })
   
-          
-   
-          
      })
 })

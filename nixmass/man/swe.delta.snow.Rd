@@ -35,16 +35,11 @@ the basis of Sturm and Holmgren (1998), who regard snow as a viscous fluid: \cr
 \deqn{\rho_i(t_{i+1}) = \rho_i(t_i)*(1+(SWE*g)/\eta_0 * exp^{-k_2*\rho_i(t_i)})}
 with \eqn{\rho_i(t_{i+1}) and \rho_i(t_i)} being tomorrow's and today's
 respective density of layer i, the gravitational acceleration
-\eqn{g = 9.8ms^{-2}}, viscosity \eqn{\eta_0} \link{Pa} and
+\eqn{g = 9.8ms^{-2}}, viscosity \eqn{\eta_0} (Pa) and
 factor \eqn{k2 [m^3kg^{-1}}], determining the importance
 of today's for tomorrow's density.
 }
 \details{
-In principal, the model is able to cope with a sub-daily temporal resolution,
-e.g. hourly snow depth observations. However, the model was fitted to daily observations,
-and the model parameter \code{rho.null} reflects that. In other words, if the observation frequency decreases,
-\code{rho.null} should change as well. Currently, no sub-daily resolution is allowed.
-
 If \code{dyn_rho_max = TRUE}, the bulk snow density varies with layer age. As activation function,
 \code{atan} is used. In that case, \code{model_opts} are extended by a lower density bound \code{rho_l},
 an upper density bound \code{rho_h}, a slope \code{sigma} and a midpoint \code{mu},
@@ -72,20 +67,27 @@ No sub-daily values are allowed at the moment (see details).
 \code{dy_rho_max=TRUE}:
 
 Instead of a constant coefficient for \code{rho.max}, these four
-parameters describe the smooth s-curve approximated by the \code{atan}trigonometric function.
+parameters describe the smooth s-curve approximated by the \code{atan} trigonometric function.
 \itemize{
 \item \code{sigma} Steepness or slope of \code{atan} at its midpoint \code{mu}, (-), \eqn{sigma > 0}.
 \item \code{mu} Central midpoint in days, where the steepest transition occurs (days), \eqn{mu > 0}.
 \item \code{rho_h} Upper density bound for a single layer and the whole snow pack (kg/m3), \eqn{rho_h > 0}.
 \item \code{rho_l} Lower density bound for a single layer and the whole snow pack, where the transition begins
 (kg/m3), \eqn{rho_l > 0}.
-All other coefficients are needed as well. Be aware however that they are slightly different.
 }
+
+All other coefficients are needed as well. Be aware however that they are slightly different.
+The easiest way to call teh original delta.swe model is \code{swe.delta.snow(hsdata, dyn_rho_max = FALSE)}.
+
+In principal, the model is able to cope with a sub-daily temporal resolution,
+e.g. hourly snow depth observations. However, the model was fitted to daily observations,
+and the model parameter \code{rho.null} reflects that. In other words, if the observation frequency decreases,
+\code{rho.null} should change as well. Currently, no sub-daily resolution is allowed.
 }
 \examples{
 data(hsdata)
 
-swe <- swe.delta.snow(hsdata)
+swe <- swe.delta.snow(hsdata, dyn_rho_max = FALSE)
 rho <- swe / hsdata$hs
 summary(rho)
 

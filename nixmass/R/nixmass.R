@@ -65,14 +65,16 @@ NULL
 #' 
 #' @details 
 #' \code{nixmass}{ This function is a wrapper for the computation of SWE with different models. 
-#' The process based model \code{\link[=swe.delta.snow]{delta.snow}} can be chosen, 
-#' as well as different empirical regression models of 
+#' The process based model \code{\link[=swe.delta.snow]{delta.snow}} 
+#' can be chosen in its original formulation (Winkler et al. 20219) and with a dynamically 
+#' increasing maximum bulk snow density (Schroeder et al., 2024), as well as different empirical regression models of 
 #' \code{\link[=swe.jo09]{Jonas},\link[=swe.pi16]{Pistocchi}, \link[=swe.st10]{Sturm}} and \link[=swe.gu19]{Guyennon}}.
-#' For the `delta.snow` model and the ones of "Pistocchi" and "Guyennon", 
+#' For the `delta.snow` models and the ones of "Pistocchi" and "Guyennon", 
 #' the needed parameters and coefficients from the original references are set as default. 
 #' They can however be changed according to results from other datasets. 
 #' For the other models of "Jonas" and "Sturm" regression coefficients are fixed. 
-#' The computation is quite fast and there does not exist any restriction 
+#' 
+#' Computation is quite fast and there does not exist any restriction 
 #' regarding the length of the data. However, if many years have to be modeled at once, 
 #' it is recommended to split the computation into single years, separated by zero snow depth values. 
 #'
@@ -81,7 +83,7 @@ NULL
 #' measured at one site. The unit must be meters (m). No gaps or NA are allowed.
 #' Dates must be either of class `character`, `Date` or `POSIXct` and given in the format 
 #' \code{YYYY-MM-DD}. No sub-daily resolution is allowed at the moment (see details).
-#' @param model Defines model for SWE computation. Can be one, several or all of "delta.snow","jo09","pi16","st10","gu19". If no model is given, all models are computed.
+#' @param model Defines model for SWE computation. Can be one, several or all of "delta.snow","delta.snow.dyn_rho_max",jo09","pi16","st10","gu19". If no model is given, all models are computed.
 #' @param alt Must be given if one of model is \code{"jo09"}. Station elevation in meters
 #' @param region.jo09 Must be given if one of model is \code{"jo09"}. This must be an integer number between 1 and 7 of the Swiss region where the station belongs to, according to Fig. 1 in the original reference. 
 #' @param region.gu19 If model contains \code{"gu19"} this must be one of "italy", "southwest", "central" or "southeast" as described in the original reference.
@@ -104,7 +106,9 @@ NULL
 #' Sturm, M. et al. (2010) "Estimating Snow Water Equivalent Using Snow Depth Data and Climate Classes", Journal of Hydrometeorology, 11(6), pp. 1380 - 1394. doi: 10.1175/2010JHM1202.1.
 #' \cr\cr
 #' Winkler, M., Schellander, H., and Gruber, S.: Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021, 2021.
-
+#' \cr\cr
+#' Schroeder, M.et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
+#
 #' @export
 #'
 #' @examples
@@ -121,28 +125,33 @@ NULL
 #' plot(o1)
 #' summary(o1)
 #' 
-nixmass <- function(data, model = c("delta.snow","jo09","pi16","st10","gu19"), alt, region.jo09, region.gu19, snowclass.st10, verbose = FALSE) {
+#' swe <- nixmass(hsdata, alt = 1000, region.jo09=1, snowclass.st10 = "tundra", region.gu19 = "italy")
+#' summary(swe)
+#' 
+nixmass <- function(data, model = c("delta.snow", "delta.snow.dyn_rho_max", "jo09","pi16","st10","gu19"), alt, region.jo09, region.gu19, snowclass.st10, verbose = FALSE) {
    
   model <- match.arg(model, several.ok = TRUE)
   if(length(model) == 0) 
-    model <- "deltasnow"
+    model <- "delta.snow"
 
   
   #-----------------------------------------------------------------------
   # split into different models
   swe <- list()
   for(m in model){
-   if(m == "delta.snow"){
-     swe[["swe"]][[m]] <- swe.delta.snow(data, rho.max=401.2588, rho.null=81.19417, c.ov=0.0005104722, k.ov=0.37856737, k=0.02993175, tau=0.02362476, eta.null=8523356, timestep=24, verbose)
-   } else if (m == "jo09"){
-     swe[["swe"]][[m]] <- swe.jo09(data, alt, region.jo09)
-   } else if (m == "pi16"){
-     swe[["swe"]][[m]] <- swe.pi16(data, rho_0=200, K=1)
-   } else if (m == "st10"){
-     swe[["swe"]][[m]] <- swe.st10(data, snowclass.st10)
-   } else if (m == "gu19"){
-     swe[["swe"]][[m]] <- swe.gu19(data, region.gu19, n0=NA ,n1=NA, n2=NA)
-   } 
+    if(m == "delta.snow"){
+      swe[["swe"]][[m]] <- swe.delta.snow(data, model_opts = list(), dyn_rho_max = FALSE, verbose)
+    } else if (m == "delta.snow.dyn_rho_max") {
+      swe[["swe"]][[m]] <- swe.delta.snow(data, model_opts = list(), dyn_rho_max = TRUE, verbose)
+    } else if (m == "jo09"){
+      swe[["swe"]][[m]] <- swe.jo09(data, alt, region.jo09)
+    } else if (m == "pi16"){
+      swe[["swe"]][[m]] <- swe.pi16(data, rho_0=200, K=1)
+    } else if (m == "st10"){
+      swe[["swe"]][[m]] <- swe.st10(data, snowclass.st10)
+    } else if (m == "gu19"){
+      swe[["swe"]][[m]] <- swe.gu19(data, region.gu19, n0=NA ,n1=NA, n2=NA)
+    } 
   }
   
   swe[["date"]] <- data$date

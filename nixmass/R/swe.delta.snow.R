@@ -11,7 +11,7 @@ utils::globalVariables(c("hs"))
 #' \deqn{\rho_i(t_{i+1}) = \rho_i(t_i)*(1+(SWE*g)/\eta_0 * exp^{-k_2*\rho_i(t_i)})}
 #' with \eqn{\rho_i(t_{i+1}) and \rho_i(t_i)} being tomorrow's and today's 
 #' respective density of layer i, the gravitational acceleration 
-#' \eqn{g = 9.8ms^{-2}}, viscosity \eqn{\eta_0} [Pa] and 
+#' \eqn{g = 9.8ms^{-2}}, viscosity \eqn{\eta_0} (Pa) and 
 #' factor \eqn{k2 [m^3kg^{-1}}], determining the importance 
 #' of today's for tomorrow's density.
 #' 
@@ -214,6 +214,13 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
   prec     <- 10^-10                           # precision for arithmetic comparisons [-]
   
   
+  #-------------------------------------------------------------------------
+  # dynamic rho.max
+  #-------------------------------------------------------------------------
+  rho_max_dyn <- function(t){
+    atan(model_opts$sigma * (t - model_opts$mu)) * (model_opts$rho_h - model_opts$rho_l) / pi + (model_opts$rho_h + model_opts$rho_l) / 2
+  }
+  
   
   #-------------------------------------------------------------------------
   # compaction of snowpack
@@ -249,6 +256,8 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
     # .d  -> today
     # .dd -> tomorrow
     age.d <- ifelse(x[1] == 0, 0, x[4])
+    if (dyn_rho_max)
+      rho.max <- rho_max_dyn(age.d)
     h.dd <- x[1]/(1 + (x[3] * g * ts)/eta.null * exp(-k * x[2]/x[1]))
     h.dd <- ifelse(x[2]/h.dd > rho.max, x[2]/rho.max, h.dd)
     h.dd <- ifelse(x[1] == 0, 0, h.dd)
@@ -281,12 +290,17 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
   drenchH <- function(t, ly, ly.tot, day.tot, Hobs, h, swe, age, H, SWE, rho.max, c.ov, k.ov, k, ts, prec, m){
     if (verbose) msg(m, t, paste("melt "))
     
-    Hobs.d=Hobs[t]; h.d=h[,2]; swe.d=swe[,2]; age.d=age[,2]
+    Hobs.d = Hobs[t]
+    h.d = h[, 2]
+    swe.d = swe[, 2]
+    age.d = age[, 2]
     
     runoff <- 0
     
     # distribute mass top-down
     for(i in ly:1){
+      if (dyn_rho_max)
+        rho.max <- rho_max_dyn(age.d[i])
       if( sum(h.d[-i]) + swe.d[i]/rho.max - Hobs.d >= prec ){
         # layers is densified to rho.max
         h.d[i] <- swe.d[i]/rho.max  
@@ -300,21 +314,34 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
     }
     
     # all layers have rho.max
+    if (dyn_rho_max)
+      rho.max <- rho_max_dyn(age.d[1:ly])
     if( all(rho.max - swe.d[1:ly]/h.d[1:ly] <= prec) ){
       if (verbose) msg(m,t,paste("no further compaction "))
       
       # produce runoff if sum(h.d) - Hobs.d is still > 0
-      #if ( sum(h.d) - Hobs.d > prec ){
       if (verbose) msg(m,t,paste("runoff "))
-      # decrease swe from all layers?
-      # or beginning with lowest?
-      #swe.d[1:ly] <- swe.d[1:ly] - (sum(h.d) - Hobs.d) * rho.max
       scale <- Hobs.d/sum(h.d)
-      runoff <- (sum(h.d) - Hobs.d) * rho.max  # excess is converted to runoff [kg/m2]
-      h.d <- h.d * scale                       # all layers are compressed (and have rho.max) [m]
-      swe.d <- swe.d * scale
+      if (dyn_rho_max) {
+        swe_total.d <- c()
+        hobs.d <- c()
+        runoff.d <- c()
+        rho.max.d <- c()
+        for(i in 1:ly){
+          rho.max.d[i] <- rho_max_dyn(age.d[i])
+          swe_total.d[i] <- h.d[i] * rho.max.d[i]
+          hobs.d[i] <- Hobs.d * h.d[i]/sum(h.d)
+          runoff.d[i] <- swe_total.d[i] - hobs.d[i] * rho.max.d[i]
+        }
+        runoff <- sum(runoff.d) 
+        h.d <- h.d * scale                       # all layers are compressed (and have rho.max) [m]
+        swe.d[1:ly] <- h.d[1:ly] * rho.max.d[1:ly]
+      } else {
+        runoff <- (sum(h.d) - Hobs.d) * rho.max  # excess is converted to runoff [kg/m2]
+        h.d <- h.d * scale                       # all layers are compressed (and have rho.max) [m]
+        swe.d <- swe.d * scale
+      }
       
-      # }
       
     } else {
       if (verbose) msg(m,t,paste("compaction "))
@@ -351,6 +378,8 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
     h.d     <- h[,1]
     swe.d   <- swe[,1]
     age.d   <- age[,2]  
+    if (dyn_rho_max)
+      rho.max <- rho_max_dyn(age.d)
     
     # todays overburden   
     swe.hat.d <- numeric(length = length(ly.tot))
@@ -387,7 +416,11 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
       
       if(length(idx.max) < ly){
         # collect excess swe in those layers
-        swe.excess <- swe.d[idx.max]-h.dd.cor[idx.max]*rho.max
+        if (dyn_rho_max) {
+          swe.excess <- swe.d[idx.max]-h.dd.cor[idx.max]*rho.max[idx.max]
+        } else{
+          swe.excess <- swe.d[idx.max]-h.dd.cor[idx.max]*rho.max
+        }
         
         # set affected layer(s) to rho.max
         swe.d[idx.max] <- swe.d[idx.max] - swe.excess             
@@ -398,7 +431,12 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
         i <- lys[length(lys)]
         swe.excess.all <- sum(swe.excess)
         while(swe.excess.all > 0){
-          swe.res <- h.dd.cor[i] * rho.max - swe.d[i] # layer tolerates this swe amount to reach rho.max
+          if (dyn_rho_max) {
+            swe.res <- h.dd.cor[i] * rho.max[i] - swe.d[i] # layer tolerates this swe amount to reach rho.max
+          } else {
+            swe.res <- h.dd.cor[i] * rho.max - swe.d[i] # layer tolerates this swe amount to reach rho.max  
+          }
+          
           if(swe.res > swe.excess.all){
             swe.res <- swe.excess.all
           }
@@ -458,8 +496,6 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
   }
   
   
-  
-  
   if(verbose){
     cat("Using parameters:\n")
     print(unlist(model_opts))
@@ -470,9 +506,15 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
     if (verbose) msg(m, t, paste0("day ", t, " (", data$date[t], "): "))
     
     # shift temporary matrices one step back in time
-    h[,1] <- h[,2]; h[,2] <- h[,3]; h[,3] <- 0
-    swe[,1] <- swe[,2]; swe[,2] <- swe[,3]; swe[,3] <- 0
-    age[,1] <- age[,2]; age[,2] <- age[,3]; age[,3] <- 0
+    h[, 1] <- h[, 2]
+    h[, 2] <- h[, 3]
+    h[, 3] <- 0
+    swe[, 1] <- swe[, 2]
+    swe[, 2] <- swe[, 3]
+    swe[, 3] <- 0
+    age[, 1] <- age[, 2]
+    age[, 2] <- age[, 3]
+    age[, 3] <- 0
     
     # snowdepth = 0, no snow cover
     if( Hobs[t] == 0 ){      
@@ -523,9 +565,13 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
         
         if( deltaH > model_opts$tau ){
           if (verbose) msg(m,t,paste("create new layer",ly+1))
-          
           sigma.null <- deltaH * model_opts$rho.null * g
-          epsilon <- model_opts$c.ov * sigma.null * exp(-model_opts$k.ov * nixmass.e$snowpack.dd$rho/(model_opts$rho.max - nixmass.e$snowpack.dd$rho))
+          if (dyn_rho_max) {
+            epsilon <- model_opts$c.ov * sigma.null * exp(-model_opts$k.ov * nixmass.e$snowpack.dd$rho/(rho_max_dyn(age[, 2]) - nixmass.e$snowpack.dd$rho))  
+          } else {
+            epsilon <- model_opts$c.ov * sigma.null * exp(-model_opts$k.ov * nixmass.e$snowpack.dd$rho/(model_opts$rho.max - nixmass.e$snowpack.dd$rho))  
+          }
+          
           
           h[,2]         <- (1 - epsilon) * h[,2]
           swe[,2]       <- swe[,1]
