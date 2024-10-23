@@ -170,7 +170,7 @@ nixmass <- function(data, model = c("delta.snow","jo09","pi16","st10","gu19"), a
 #' 
 summary.nixmass <- function(object, ...){
   
-  if(class(object) != "nixmass")
+  if(!inherits(object, "nixmass"))
     stop("nixmass: Object must be of class 'nixmass'.")
   
   models <- names(object$swe)
@@ -206,7 +206,7 @@ summary.nixmass <- function(object, ...){
 #' 
 plot.nixmass <- function(x, title = NULL, ...){
   
-  if(class(x) != "nixmass")
+  if(!inherits(x, "nixmass"))
     stop("nixmass: Object must be of class 'nixmass'.")
   
   models <- names(x$swe)
