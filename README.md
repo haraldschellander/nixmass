@@ -2,6 +2,9 @@
 
 <!-- badges: start -->
 <!--[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)-->
+
+![Dev vesrion](https://img.shields.io/github/v/tag/haraldschellander/mevr)
+
 [![CRAN status](https://www.r-pkg.org/badges/version/nixmass)](https://CRAN.R-project.org/package=nixmass)
 <!-- badges: end -->
 
