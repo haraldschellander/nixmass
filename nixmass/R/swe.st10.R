@@ -29,7 +29,7 @@ swe.st10 <- function(data, snowclass.st10 = c("alpine","maritime","prairie","tun
   if(!inherits(data,"data.frame"))
     stop("swe.st10: data must be given as data.frame")
   
-  if(!any((is.element(colnames(data), c("hs","date")))))
+  if(!all("hs" %in% colnames(data) & "date" %in% colnames(data)))
      stop("swe.st10: data must contain at least two columns named 'hs' and 'date'")
   
   Hobs <- data$hs * 100 # hs must be in [cm]
@@ -55,8 +55,8 @@ swe.st10 <- function(data, snowclass.st10 = c("alpine","maritime","prairie","tun
  
   #-----------------------------------------------------------------------
   snowclass.st10 <- match.arg(snowclass.st10)
-  if(length(snowclass.st10) == 0 | length(snowclass.st10) > 1)
-    stop("swe.st10: snowclass.st10 must be one of 'alpine','maritime','prairie','tundra','taiga'")
+  #if(length(snowclass.st10) == 0 | length(snowclass.st10) > 1)
+  #  stop("'arg' should be one of 'alpine','maritime','prairie','tundra','taiga'")
   
   sturm.params <- data.frame(
     "den.max" = c(0.5975,0.5979,0.5940,0.3630,0.2170),
