@@ -148,11 +148,11 @@ nixmass <- function(data, model = c("delta.snow", "delta.snow.dyn_rho_max", "jo0
     } else if (m == "jo09"){
       swe[["swe"]][[m]] <- swe.jo09(data, alt, region.jo09)
     } else if (m == "pi16"){
-      swe[["swe"]][[m]] <- swe.pi16(data, rho_0=200, K=1)
+      swe[["swe"]][[m]] <- swe.pi16(data, rho_0 = 200, K = 1)
     } else if (m == "st10"){
       swe[["swe"]][[m]] <- swe.st10(data, snowclass.st10)
     } else if (m == "gu19"){
-      swe[["swe"]][[m]] <- swe.gu19(data, region.gu19, n0=NA ,n1=NA, n2=NA)
+      swe[["swe"]][[m]] <- swe.gu19(data, region.gu19, n0 = NA, n1 = NA, n2 = NA)
     } 
   }
   
