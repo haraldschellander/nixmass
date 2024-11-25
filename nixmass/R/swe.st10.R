@@ -52,7 +52,7 @@ swe.st10 <- function(data, snowclass.st10 = c("alpine","maritime","prairie","tun
   } else {
     stop("date column must be either of class 'character', 'Date' or 'POSIXct'")
   }
-  
+ 
   #-----------------------------------------------------------------------
   snowclass.st10 <- match.arg(snowclass.st10)
   if(length(snowclass.st10) == 0 | length(snowclass.st10) > 1)

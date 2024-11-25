@@ -131,12 +131,37 @@ NULL
 #' swe <- nixmass(hsdata, alt = 1000, region.jo09=1, snowclass.st10 = "tundra", region.gu19 = "italy")
 #' summary(swe)
 #' 
-nixmass <- function(data, model = c("delta.snow", "delta.snow.dyn_rho_max", "jo09","pi16","st10","gu19"), alt, region.jo09, region.gu19, snowclass.st10, verbose = FALSE) {
-   
-  model <- match.arg(model, several.ok = TRUE)
-  if(length(model) == 0) 
+nixmass <- function(data, model = c("delta.snow", "delta.snow.dyn_rho_max", "jo09","pi16","st10","gu19"), 
+                    alt, region.jo09, region.gu19, snowclass.st10, verbose = FALSE) {
+  
+  if (missing(model)) {
     model <- "delta.snow"
-
+  } else {
+    model <- match.arg(model, several.ok = TRUE)
+  }
+  
+  if (any(grepl("jo09", model))) {
+    if (missing(alt))
+      stop("Argument 'alt' is missing")
+    if (missing(region.jo09))
+      stop("Argument 'region.jo09' is missing")
+  } 
+  
+  if (any(grepl("pi16", model))) {
+    if (missing(snowclass.st10))
+      stop("Argument 'snowclass.st10' is missing")
+  }
+  
+  if (any(grepl("st10", model))) {
+    if (missing(snowclass.st10))
+      stop("Argument 'snowclass.st10' is missing")
+  }
+  
+  if (any(grepl("gu19", model))) {
+    if (missing(region.gu19))
+      stop("Argument 'region.gu19' is missing")
+  }
+  
   
   #-----------------------------------------------------------------------
   # split into different models
