@@ -40,7 +40,7 @@ swe.gu19 <- function(data, region.gu19, n0=NA ,n1=NA, n2=NA){
   if(!inherits(data,"data.frame"))
     stop("swe.gu19: data must be given as data.frame")
   
-  if(!any((is.element(colnames(data), c("hs","date")))))
+  if(!all("hs" %in% colnames(data) & "date" %in% colnames(data)))
     stop("swe.gu19: data must contain at least two columns named 'hs' and 'date'")
   
   Hobs <- data$hs
