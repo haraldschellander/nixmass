@@ -32,7 +32,7 @@ swe.jo09 <- function(data, alt, region.jo09){
   if(!inherits(data,"data.frame"))
     stop("swe.jo09: data must be given as data.frame")
   
-  if(!any((is.element(colnames(data), c("hs","date")))))
+  if(!all("hs" %in% colnames(data) & "date" %in% colnames(data)))
     stop("swe.jo09: data must contain at least two columns named 'hs' and 'date'")
   
   Hobs <- data$hs
@@ -63,20 +63,27 @@ swe.jo09 <- function(data, alt, region.jo09){
   
   #-----------------------------------------------------------------------
   # check alt >= 0
-  if(missing(alt))
+  if(missing(alt) | is.na(alt))
     stop("swe.jo09: station elevation must be given")
-  if (!alt >= 0)
+  if (alt < 0)
     stop("swe.jo09: station elevation must not be negative")
-  if(is.na(alt))
-    stop("swe.jo09: station elevation must not be NA")
+  ##if(is.na(alt[which(alt > 0)]))
+  #  stop("swe.jo09: station elevation must not be NA")
   if(!is.numeric(alt))
     stop("swe.jo09: station elevation must be numeric")
   
-  # check climateclass 1-7
+  # check climate class 1-7
   if(missing(region.jo09))
     stop("swe.jo09: region.jo09 must be given")
-  if (!is.element(region.jo09,1:7))
-    stop("swe.jo09: region.jo09 must be integer between 1 and 7")
+  if (length(region.jo09) > 1) {
+    for (reg in region.jo09) {
+      if (!is.element(reg,1:7))
+        stop("swe.jo09: region.jo09 must be integer between 1 and 7")  
+    }
+  } else {
+    if (!is.element(region.jo09,1:7))
+      stop("swe.jo09: region.jo09 must be integer between 1 and 7")  
+  }
   if (length(region.jo09) > 1)
     stop("region.jo09 must be of length one")
   
