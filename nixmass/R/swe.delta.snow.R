@@ -86,12 +86,14 @@ utils::globalVariables(c("hs"))
 #' @author Harald Schellander, Michael Winkler
 
 #' @examples
-#' data(hsdata)
+#' data(hsdata, package = "nixmass")
 #' 
+#' swe_dyn <- swe.delta.snow(hsdata)
 #' swe <- swe.delta.snow(hsdata, dyn_rho_max = FALSE)
-#' rho <- swe / hsdata$hs
-#' summary(rho)
-#' 
+#' plot(seq_along(hsdata$date), swe_dyn, type = "l", ylab = "SWE (mm) / hs (cm)", xlab = "day")
+#' lines(seq_along(hsdata$date), swe, type = "l", col = "red") 
+#' lines(seq_along(hsdata$date), hsdata$hs * 100, type = "l", lty = 2, col = "grey30") 
+#' legend(title = "delta.snow", "topleft", legend = c("SWE dyn", "SWE", "HS"), col = c("black", "red", "grey30"), lty = c(1, 1, 2))
 #' 
 swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbose = FALSE) {
   
