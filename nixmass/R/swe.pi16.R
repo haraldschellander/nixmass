@@ -28,7 +28,7 @@ swe.pi16 <- function(data, rho_0=200, K=1){
   if(!inherits(data,"data.frame"))
     stop("swe.pi16: data must be given as data.frame")
   
-  if(!any((is.element(colnames(data), c("hs","date")))))
+  if(!all("hs" %in% colnames(data) & "date" %in% colnames(data)))
     stop("swe.pi16: data must contain at least two columns named 'hs' and 'date'")
   
   Hobs <- data$hs
