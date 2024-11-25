@@ -85,8 +85,9 @@ NULL
 #' \code{YYYY-MM-DD}. No sub-daily resolution is allowed at the moment (see details).
 #' @param model Defines model for SWE computation. Can be one, several or all of `delta.snow`,
 #' `delta.snow.dyn_rho_max`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given, all models are computed.
-#' @param alt Must be given if one of model is `jo09`. Station elevation in meters
-#' @param region.jo09 Must be given if one of model is `jo09`. This must be an integer number between 1 and 7 of the Swiss region where the station belongs to, according to Fig. 1 in the original reference. 
+#' @param alt Must be given if one of model is `jo09`. Station elevation in meters.
+#' @param region.jo09 Must be given if one of model is `jo09`. This must be an integer number 
+#' between 1 and 7 of the Swiss region where the station belongs to, according to Fig. 1 in the original reference. 
 #' @param region.gu19 If model contains `gu19` this must be one of `italy`, `southwest`, `central` or `southeast` as described in the original reference.
 #' @param snowclass.st10 Must be given if one of model is `st10`. Must be one of the following character strings: 
 #' `alpine`, `maritime`, `prairie`, `tundra`, `taiga` as outlined in the original reference.

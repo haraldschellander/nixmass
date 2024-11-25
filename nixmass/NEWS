@@ -1,12 +1,13 @@
-nixmass v1.1-3 (release date: 2024-10-23)
+nixmass v1.1.3 (release date: 2024-10-23)
 =========================================
      
 Changes: 
 
 * The maximum bulk snow density increases smoothly with age following a trigonometric `atan` activation function.
+* The swe.delta.snow function is backwards compatible with the original delta.snow formulation.
 
 
-nixmass v1.0-3 (release date: 2024-06-11)
+nixmass v1.0.3 (release date: 2024-06-11)
 =========================================
      
 Changes: 
@@ -16,7 +17,7 @@ Changes:
 * Stability in terms of failure tests has been strongly improved.
 
 
-nixmass v1.0-2 (released ate: 2021-03-05)
+nixmass v1.0.2 (released ate: 2021-03-05)
 =========================================
      
 Changes: 

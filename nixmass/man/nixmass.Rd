@@ -21,20 +21,23 @@ measured at one site. The unit must be meters (m). No gaps or NA are allowed.
 Dates must be either of class `character`, `Date` or `POSIXct` and given in the format 
 \code{YYYY-MM-DD}. No sub-daily resolution is allowed at the moment (see details).}
 
-\item{model}{Defines model for SWE computation. Can be one, several or all of "delta.snow","delta.snow.dyn_rho_max",jo09","pi16","st10","gu19". If no model is given, all models are computed.}
+\item{model}{Defines model for SWE computation. Can be one, several or all of `delta.snow`,
+`delta.snow.dyn_rho_max`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given, all models are computed.}
 
-\item{alt}{Must be given if one of model is \code{"jo09"}. Station elevation in meters}
+\item{alt}{Must be given if one of model is `jo09`. Station elevation in meters.}
 
-\item{region.jo09}{Must be given if one of model is \code{"jo09"}. This must be an integer number between 1 and 7 of the Swiss region where the station belongs to, according to Fig. 1 in the original reference.}
+\item{region.jo09}{Must be given if one of model is `jo09`. This must be an integer number 
+between 1 and 7 of the Swiss region where the station belongs to, according to Fig. 1 in the original reference.}
 
-\item{region.gu19}{If model contains \code{"gu19"} this must be one of "italy", "southwest", "central" or "southeast" as described in the original reference.}
+\item{region.gu19}{If model contains `gu19` this must be one of `italy`, `southwest`, `central` or `southeast` as described in the original reference.}
 
-\item{snowclass.st10}{Must be given if one of model is \code{"st10"}. Must be one of the following character strings: "alpine","maritime","prairie","tundra","taiga" as outlined in the original reference.}
+\item{snowclass.st10}{Must be given if one of model is `st10`. Must be one of the following character strings: 
+`alpine`, `maritime`, `prairie`, `tundra`, `taiga` as outlined in the original reference.}
 
 \item{verbose}{Logical. Should additional information be given during runtime?}
 }
 \value{
-A list of class \code{"nixmass"} with components:
+A list of class \code{nixmass} with components:
 \item{swe}{ Contains a list of numerical vectors. Each entry refers to SWE values computed with the selected model(s). }
 \item{date}{Vector of date strings in the input class of format \code{YYYY-MM-DD}.}
 \item{hs}{Vector of given snow depth values used to compute SWE. }
@@ -50,10 +53,10 @@ The process based model \code{\link[=swe.delta.snow]{delta.snow}}
 can be chosen in its original formulation (Winkler et al. 20219) and with a dynamically 
 increasing maximum bulk snow density (Schroeder et al., 2024), as well as different empirical regression models of 
 \code{\link[=swe.jo09]{Jonas},\link[=swe.pi16]{Pistocchi}, \link[=swe.st10]{Sturm}} and \link[=swe.gu19]{Guyennon}}.
-For the `delta.snow` models and the ones of "Pistocchi" and "Guyennon", 
+For the `delta.snow` models and the ones of `Pistocchi` and `Guyennon`, 
 the needed parameters and coefficients from the original references are set as default. 
 They can however be changed according to results from other datasets. 
-For the other models of "Jonas" and "Sturm" regression coefficients are fixed. 
+For the other models of `Jonas` and `Sturm` regression coefficients are fixed. 
 
 Computation is quite fast and there does not exist any restriction 
 regarding the length of the data. However, if many years have to be modeled at once, 

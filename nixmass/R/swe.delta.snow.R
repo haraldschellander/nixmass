@@ -61,7 +61,9 @@ utils::globalVariables(c("hs"))
 #' (kg/m3), \eqn{rho_l > 0}. 
 #' 
 #' All other coefficients are needed as well. Be aware however that they are slightly different.
-#' The easiest way to call teh original delta.swe model is \code{swe.delta.snow(hsdata, dyn_rho_max = FALSE)}.
+#' The easiest way to call the original delta.swe model is \code{swe.delta.snow(hsdata, dyn_rho_max = FALSE)}.
+#' Note that parameters intrinsic to the dynamic density model provided with the original model 
+#' are silently ignored. 
 #' 
 #' In principal, the model is able to cope with a sub-daily temporal resolution, 
 #' e.g. hourly snow depth observations. However, the model was fitted to daily observations, 
@@ -93,7 +95,8 @@ utils::globalVariables(c("hs"))
 #' plot(seq_along(hsdata$date), swe_dyn, type = "l", ylab = "SWE (mm) / hs (cm)", xlab = "day")
 #' lines(seq_along(hsdata$date), swe, type = "l", col = "red") 
 #' lines(seq_along(hsdata$date), hsdata$hs * 100, type = "l", lty = 2, col = "grey30") 
-#' legend(title = "delta.snow", "topleft", legend = c("SWE dyn", "SWE", "HS"), col = c("black", "red", "grey30"), lty = c(1, 1, 2))
+#' legend(title = "delta.snow", "topleft", legend = c("SWE dyn", "SWE", "HS"), 
+#'  col = c("black", "red", "grey30"), lty = c(1, 1, 2))
 #' 
 swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbose = FALSE) {
   
@@ -171,7 +174,6 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
     stop("'rho.max' must not be negative or 0")
   }
   
-  
   if (model_opts$rho.null <= 0)
     stop("'rho.null' must not be negative or 0")
   if (model_opts$c.ov <= 0)
@@ -184,7 +186,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
     stop("'k' must not be negative or 0")
   if (model_opts$tau <= 0)
     stop("'tau' must not be negative or 0")
-  
+ 
   # check timestep vs data
   if (model_opts$timestep < 24)
     stop("timestep must be >= 24 hours")

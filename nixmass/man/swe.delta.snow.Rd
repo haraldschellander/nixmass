@@ -77,7 +77,9 @@ parameters describe the smooth s-curve approximated by the \code{atan} trigonome
 }
 
 All other coefficients are needed as well. Be aware however that they are slightly different.
-The easiest way to call teh original delta.swe model is \code{swe.delta.snow(hsdata, dyn_rho_max = FALSE)}.
+The easiest way to call the original delta.swe model is \code{swe.delta.snow(hsdata, dyn_rho_max = FALSE)}.
+Note that parameters intrinsic to the dynamic density model provided with the original model
+are silently ignored.
 
 In principal, the model is able to cope with a sub-daily temporal resolution,
 e.g. hourly snow depth observations. However, the model was fitted to daily observations,
@@ -85,12 +87,15 @@ and the model parameter \code{rho.null} reflects that. In other words, if the ob
 \code{rho.null} should change as well. Currently, no sub-daily resolution is allowed.
 }
 \examples{
-data(hsdata)
+data(hsdata, package = "nixmass")
 
+swe_dyn <- swe.delta.snow(hsdata)
 swe <- swe.delta.snow(hsdata, dyn_rho_max = FALSE)
-rho <- swe / hsdata$hs
-summary(rho)
-
+plot(seq_along(hsdata$date), swe_dyn, type = "l", ylab = "SWE (mm) / hs (cm)", xlab = "day")
+lines(seq_along(hsdata$date), swe, type = "l", col = "red") 
+lines(seq_along(hsdata$date), hsdata$hs * 100, type = "l", lty = 2, col = "grey30") 
+legend(title = "delta.snow", "topleft", legend = c("SWE dyn", "SWE", "HS"), 
+ col = c("black", "red", "grey30"), lty = c(1, 1, 2))
 
 }
 \references{
