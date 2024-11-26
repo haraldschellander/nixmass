@@ -32,7 +32,7 @@ head(hsdata)
 plot(hsdata$hs, type="o")
 
 ## compute snow water equivalents
-o <- nixmass(hsdata, model="delta.snow",verbose=TRUE)
+o <- nixmass(hsdata, model="delta.snow")
 plot(o)
 
 o1 <- nixmass(hsdata, alt=600, region.jo09 = 6, region.gu19 = "central",
