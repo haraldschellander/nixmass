@@ -43,7 +43,7 @@ NULL
 #' plot(hsdata$hs, type="o")
 #' 
 #' ## compute snow water equivalents
-#' o <- nixmass(hsdata, model="delta.snow",verbose=TRUE)
+#' o <- nixmass(hsdata, model="delta.snow")
 #' plot(o)
 #' 
 #' o1 <- nixmass(hsdata, alt=600, region.jo09 = 6, region.gu19 = "central",
@@ -147,10 +147,10 @@ nixmass <- function(data, model = c("delta.snow", "delta.snow.dyn_rho_max", "jo0
       stop("Argument 'region.jo09' is missing")
   } 
   
-  if (any(grepl("pi16", model))) {
-    if (missing(snowclass.st10))
-      stop("Argument 'snowclass.st10' is missing")
-  }
+  # if (any(grepl("pi16", model))) {
+  #   if (missing(snowclass.st10))
+  #     stop("Argument 'snowclass.st10' is missing")
+  # }
   
   if (any(grepl("st10", model))) {
     if (missing(snowclass.st10))
@@ -220,7 +220,12 @@ summary.nixmass <- function(object, ...){
   mm <- sapply(lm,c)
   mmm <- cbind(m,mm)
   mmm <- mmm[,c(1:3,6,4,5)]
-  colnames(mmm) <- c("Min.","1st Qu.","Median","Mean","3rd Qu.","Max.")
+  if (length(models) > 1) {
+    mmm <- data.frame(mmm)
+    colnames(mmm) <- c("Min.","1st Qu.","Median","Mean","3rd Qu.","Max.")  
+  } else {
+  names(mmm) <- c("Min.","1st Qu.","Median","Mean","3rd Qu.","Max.")
+  }
   print(mmm)
 }
 
