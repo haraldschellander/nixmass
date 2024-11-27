@@ -20,7 +20,7 @@ install.packages("nixmass")
 
 
 ## Development version
-To install the package in development version from GitHub
+To install the development version from GitHub
 
 ```r
 # install.packages("pak")
