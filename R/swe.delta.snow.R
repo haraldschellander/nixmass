@@ -29,9 +29,10 @@ utils::globalVariables(c("hs"))
 #'
 #' @details
 #' If \code{dyn_rho_max = TRUE}, the bulk snow density varies with layer age. As activation function, 
-#' `atan` is used. In that case, \code{model_opts} are extended by a lower density bound \code{rho_l}, 
+#' `atan` is used, where the S-curve symmetrically transitions from the lower to the upper density bound. 
+#' In that case, \code{model_opts} are extended by a lower density bound \code{rho_l}, 
 #' an upper density bound \code{rho_h}, a slope \code{sigma} and a midpoint \code{mu}, 
-#' where the S-curve symmetrically transitions from the lower to the upper density bound. 
+#' which have been found via an optimisation procedure (Winkler et al., 2021). 
 #' Be aware that also the other model coefficients do slightly change.   
 #' 
 #' The following model coefficients must be provided:
@@ -53,7 +54,7 @@ utils::globalVariables(c("hs"))
 #' \code{dy_rho_max=TRUE}: 
 #' 
 #' Instead of a constant coefficient for \code{rho.max}, these four
-#' parameters describe the smooth s-curve approximated by the `atan` trigonometric function. 
+#' parameters describe the smooth S-curve approximated by the `atan` trigonometric function. 
 #' * \code{sigma} Steepness or slope of `atan` at its midpoint \code{mu}, (-), \eqn{sigma > 0}.
 #' * \code{mu} Central midpoint in days, where the steepest transition occurs (days), \eqn{mu > 0}.
 #' * \code{rho_h} Upper density bound for a single layer and the whole snow pack (kg/m3), \eqn{rho_h > 0}. 
@@ -61,13 +62,14 @@ utils::globalVariables(c("hs"))
 #' (kg/m3), \eqn{rho_l > 0}. 
 #' 
 #' All other coefficients are needed as well. Be aware however that they are slightly different.
+#' 
 #' The easiest way to call the original delta.swe model is \code{swe.delta.snow(hsdata, dyn_rho_max = FALSE)}.
 #' Note that parameters intrinsic to the dynamic density model provided with the original model 
 #' are silently ignored. 
 #' 
 #' In principal, the model is able to cope with a sub-daily temporal resolution, 
 #' e.g. hourly snow depth observations. However, the model was fitted to daily observations, 
-#' and the model parameter \code{rho.null} reflects that. In other words, if the observation frequency decreases, 
+#' and the model parameter \code{rho.null} reflects that. In other words, if the observation frequency changes, 
 #'  \code{rho.null} should change as well. Currently, no sub-daily resolution is allowed.
 #' 
 #' 
