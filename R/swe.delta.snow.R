@@ -100,7 +100,7 @@ utils::globalVariables(c("hs"))
 #' legend(title = "delta.snow", "topleft", legend = c("SWE dyn", "SWE", "HS"), 
 #'  col = c("black", "red", "grey30"), lty = c(1, 1, 2))
 #' 
-swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbose = FALSE) {
+swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers = FALSE, verbose = FALSE) {
   
   if (dyn_rho_max) {
     model_opts_defaults <- list(
@@ -218,9 +218,12 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
   # helper
   if (verbose) m <- rep("", day.tot)            # vector of (verbose) messages
   prec     <- 10^-10                           # precision for arithmetic comparisons [-]
-  h_layers <- list()
-  swe_layers <- list()
-  age_layers <- list()
+  
+  if (layers) {                                   # return parameters layerwise
+       h_layers <- list()
+       swe_layers <- list()
+       age_layers <- list()
+  }
   
   #-------------------------------------------------------------------------
   # dynamic rho.max
@@ -540,9 +543,11 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
       h[,2]   <- 0
       swe[,2] <- 0
       
-      h_layers[[t]] <- 0
-      swe_layers[[t ]] <- 0 
-      age_layers[[t]] <- 0  
+      if (layers) {
+           h_layers[[t]] <- 0
+           swe_layers[[t ]] <- 0 
+           age_layers[[t]] <- 0  
+      }
       
       # there is snow
     } else if (Hobs[t] > 0 ) {
@@ -569,9 +574,11 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
         H   <- rl$H
         SWE <- rl$SWE
         
-        h_layers[[t]] <- h[, 2]  
-        swe_layers[[t ]] <- swe[, 2]  
-        age_layers[[t]] <- age[, 2]  
+        if (layers) {
+             h_layers[[t]] <- h[, 2]  
+             swe_layers[[t ]] <- swe[, 2]  
+             age_layers[[t]] <- age[, 2]  
+        }
         
         # non-first day of snow covered period
       } else if ( Hobs[t-1] > 0 ){
@@ -619,9 +626,11 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
           H   <- rl$H
           SWE <- rl$SWE
           
-          h_layers[[t]] <- h[, 2]  
-          swe_layers[[t ]] <- swe[, 2]  
-          age_layers[[t]] <- age[, 2]  
+          if (layers) {
+               h_layers[[t]] <- h[, 2]  
+               swe_layers[[t ]] <- swe[, 2]  
+               age_layers[[t]] <- age[, 2]  
+          }
           
           # no mass gain or loss, but scaling
         } else if( deltaH >= -model_opts$tau & deltaH <= model_opts$tau ) {
@@ -634,9 +643,11 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
           H   <- rl$H
           SWE <- rl$SWE
           
-          h_layers[[t]] <- h[, 2]  
-          swe_layers[[t ]] <- swe[, 2]  
-          age_layers[[t]] <- age[, 2]  
+          if (layers) {
+               h_layers[[t]] <- h[, 2]  
+               swe_layers[[t ]] <- swe[, 2]  
+               age_layers[[t]] <- age[, 2]  
+          }
           
         } else if ( deltaH < -model_opts$tau ){
           if (verbose) msg(m,t,paste("drenching: "))
@@ -648,9 +659,11 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
           H   <- rl$H
           SWE <- rl$SWE
           
-          h_layers[[t]] <- h[, 2]  
-          swe_layers[[t ]] <- swe[, 2]  
-          age_layers[[t]] <- age[, 2]  
+          if (layers) {
+               h_layers[[t]] <- h[, 2]  
+               swe_layers[[t ]] <- swe[, 2]  
+               age_layers[[t]] <- age[, 2]  
+          }
           
         } else {
           if (verbose) msg(m,t,"?")
@@ -659,29 +672,34 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, verbos
     } 
     if (verbose) msg(m,t,"\n")
   }
-  #return(SWE)
   
   # compile layers
-  h_layers <- lapply(h_layers, function(x) {
-       length(x) <- ly
-       x
-  })
-  h_layers <- do.call(cbind, h_layers)
-  h_layers <- apply(h_layers, 2, function(x) rev(x))
+  if (layers) {
+       h_layers <- lapply(h_layers, function(x) {
+            length(x) <- ly
+            x
+       })
+       h_layers <- do.call(cbind, h_layers)
+       h_layers <- apply(h_layers, 2, function(x) rev(x))
+       
+       swe_layers <- lapply(swe_layers, function(x) {
+            length(x) <- ly
+            x
+       })
+       swe_layers <- do.call(cbind, swe_layers)
+       swe_layers <- apply(swe_layers, 2, function(x) rev(x))
+       
+       age_layers <- lapply(age_layers, function(x) {
+            length(x) <- ly
+            x
+       })
+       age_layers <- do.call(cbind, age_layers)
+       age_layers <- apply(age_layers, 2, function(x) rev(x))
+       
+       res <- list("SWE" = SWE, "h" = h_layers, "swe" = swe_layers, "age" = age_layers)
+  } else {
+       res <- SWE
+  }
   
-  swe_layers <- lapply(swe_layers, function(x) {
-       length(x) <- ly
-       x
-  })
-  swe_layers <- do.call(cbind, swe_layers)
-  swe_layers <- apply(swe_layers, 2, function(x) rev(x))
-  
-  age_layers <- lapply(age_layers, function(x) {
-       length(x) <- ly
-       x
-  })
-  age_layers <- do.call(cbind, age_layers)
-  age_layers <- apply(age_layers, 2, function(x) rev(x))
-  
-  return(list("SWE" = SWE, "h" = h_layers, "swe" = swe_layers, "age" = age_layers))
+  return(res)
 }
