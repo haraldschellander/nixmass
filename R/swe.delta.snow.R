@@ -25,6 +25,7 @@ utils::globalVariables(c("hs"))
 #' the maximum layer and bulk snow densities are allowed to vary with age (see details).
 #' @param dyn_rho_max Logical. If `TRUE`, the maximum bulk snow density is allowed to vary with layer age (see details).
 #' if `FALSE`, the original delta.snow model is used.
+#' @param layers Should parameters snow depth, swe and age be returned layerwise? Can be \code{TRUE} or \code{FALSE}.
 #' @param verbose Should additional information be given during runtime? Can be \code{TRUE} or \code{FALSE}.
 #'
 #' @details
@@ -32,7 +33,7 @@ utils::globalVariables(c("hs"))
 #' `atan` is used, where the S-curve symmetrically transitions from the lower to the upper density bound. 
 #' In that case, \code{model_opts} are extended by a lower density bound \code{rho_l}, 
 #' an upper density bound \code{rho_h}, a slope \code{sigma} and a midpoint \code{mu}, 
-#' which have been found via an optimisation procedure (Winkler et al., 2021). 
+#' which have been found via an optimization procedure (Winkler et al., 2021). 
 #' Be aware that also the other model coefficients do slightly change.   
 #' 
 #' The following model coefficients must be provided:
@@ -41,7 +42,7 @@ utils::globalVariables(c("hs"))
 #'  * \code{rho.max} Maximum density of an individual snow layer produced by 
 #'  the delta.snow model (kg/m3), \eqn{rho.max > 0}
 #'  * \code{rho.null} Fresh snow density for a newly created layer (kg/m3), \eqn{rho.null > 0}. 
-#'  Currently optimised for daily snow depth observations.
+#'  Currently optimized for daily snow depth observations.
 #'  * \code{c.ov} Overburden factor due to fresh snow (-), \eqn{c.ov > 0}
 #'  * \code{k.ov} Defines the impact of the individual layer density on the 
 #'  compaction due to overburden (-), \eqn{k.ov \in [0,1]}.
@@ -74,7 +75,10 @@ utils::globalVariables(c("hs"))
 #' 
 #' 
 #' @md
-#' @return A vector with daily SWE values in mm. 
+#' @return If \code{layears = FAlSE}, a vector with daily SWE values in mm. If \code{layers=TRUE}, a list with layerwise matrices 
+#' of the parameters h (snow depth), swe and age is returned additionally to the SWE vector. The matrix holds `dates` on the x-axis and 
+#' `layers` on the y-axis. swe is in mm, h in m and age in days. 
+#'  I
 #' @export
 #' 
 #' @references Gruber, S. (2014) "Modelling snow water equivalent based on daily snow depths", Masterthesis, Institute for Atmospheric and Cryospheric Sciences, University of Innsbruck.
