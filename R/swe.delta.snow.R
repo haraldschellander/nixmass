@@ -221,8 +221,8 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   
   
   # helper
-  if (verbose) m <- rep("", day.tot)            # vector of (verbose) messages
-  prec     <- 10^-10                           # precision for arithmetic comparisons [-]
+  if (verbose) m <- rep("", day.tot)              # vector of (verbose) messages
+  prec     <- 10^-10                              # precision for arithmetic comparisons [-]
   
   if (layers) {                                   # return parameters layerwise
        h_layers <- list()
@@ -518,6 +518,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   }
   
   for (t in 1:day.tot) {
+  #for (t in 2:day.tot) {
     
     if (verbose) msg(m, t, paste0("day ", t, " (", data$date[t], "): "))
     
@@ -533,9 +534,9 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
     age[, 3] <- 0
     
     # snowdepth = 0, no snow cover
-    if ( Hobs[t] == 0 ) {      
+    if (Hobs[t] == 0) {      
       if (t > 1){
-        if (Hobs[t-1] == 0) {
+        if (Hobs[t - 1] == 0) {
           if (verbose) msg(m, t, paste0(""))        
         } else {
           if (verbose) msg(m, t, paste0("runoff"))
@@ -543,10 +544,10 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
       } else {
         if (verbose) msg(m, t, paste0(""))         
       }
-      H[t]    <- 0
-      SWE[t]  <- 0
-      h[,2]   <- 0
-      swe[,2] <- 0
+      H[t]     <- 0
+      SWE[t]   <- 0
+      h[, 2]   <- 0
+      swe[, 2] <- 0
       
       if (layers) {
            h_layers[[t]] <- 0
@@ -555,18 +556,18 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
       }
       
       # there is snow
-    } else if (Hobs[t] > 0 ) {
+    } else if (Hobs[t] > 0) {
       
       # first snow in/during season
-      if ( Hobs[t-1] == 0 ) {
+      if (Hobs[t - 1] == 0) {
         ly <- 1
         if (verbose) msg(m,t,paste("produce layer",ly))
-        age[ly,2] <- 1
-        h[ly,2]   <- Hobs[t]
-        H[t]      <- Hobs[t]
-        swe[ly,2] <- model_opts$rho.null * Hobs[t]
-        SWE[t]    <- swe[ly,2]
-        ly.tot    <- nrow(h)
+        age[ly, 2] <- 1
+        h[ly, 2]   <- Hobs[t]
+        H[t]       <- Hobs[t]
+        swe[ly, 2] <- model_opts$rho.null * Hobs[t]
+        SWE[t]     <- swe[ly,2]
+        ly.tot     <- nrow(h)
         
         # compact actual day 
         snowpack.tomorrow <- dry_compaction(h[,2], swe[,2], age[,2], ly.tot, ly, model_opts$k, model_opts$rho.max, ts, prec, g)
@@ -586,34 +587,38 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
         }
         
         # non-first day of snow covered period
-      } else if ( Hobs[t-1] > 0 ){
+      } else if (Hobs[t - 1] > 0) {
         
         deltaH <- Hobs[t] - H[t]
         
-        if( deltaH > model_opts$tau ){
-          if (verbose) msg(m,t,paste("create new layer",ly+1))
+        if (deltaH > model_opts$tau) {
+          if (verbose) msg(m, t, paste("create new layer", ly + 1))
           sigma.null <- deltaH * model_opts$rho.null * g
           if (dyn_rho_max) {
+#######
+####### when we start during the season, nixmass.e$snowpack.dd is NULL, 
+####### because the step above with a call to dry_compaction was not conducted
+#######
             epsilon <- model_opts$c.ov * sigma.null * exp(-model_opts$k.ov * nixmass.e$snowpack.dd$rho/(rho_max_dyn(age[, 2]) - nixmass.e$snowpack.dd$rho))  
           } else {
             epsilon <- model_opts$c.ov * sigma.null * exp(-model_opts$k.ov * nixmass.e$snowpack.dd$rho/(model_opts$rho.max - nixmass.e$snowpack.dd$rho))  
           }
           
           
-          h[,2]         <- (1 - epsilon) * h[,2]
-          swe[,2]       <- swe[,1]
-          age[(1:ly),2] <- age[(1:ly),1] + 1
-          H[t]          <- sum(h[,2])
-          SWE[t]        <- sum(swe[,2])
+          h[, 2]         <- (1 - epsilon) * h[, 2]
+          swe[, 2]       <- swe[, 1]
+          age[(1:ly), 2] <- age[(1:ly), 1] + 1
+          H[t]           <- sum(h[, 2])
+          SWE[t]         <- sum(swe[, 2])
           
           # only for new layer add new layer to matrices
-          h             <- rbind(h,rep(0,3))
-          swe           <- rbind(swe,rep(0,3))
-          age           <- rbind(age,rep(0,3))   
-          ly            <- ly + 1
-          h[ly,2]       <- Hobs[t] - H[t]
-          swe[ly,2]     <- model_opts$rho.null * h[ly,2]
-          age[ly,2]     <- 1
+          h              <- rbind(h, rep(0, 3))
+          swe            <- rbind(swe, rep(0, 3))
+          age            <- rbind(age, rep(0, 3))   
+          ly             <- ly + 1
+          h[ly, 2]       <- Hobs[t] - H[t]
+          swe[ly, 2]     <- model_opts$rho.null * h[ly, 2]
+          age[ly, 2]     <- 1
           
           # recompute
           H[t]          <- sum(h[,2])
@@ -638,7 +643,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
           }
           
           # no mass gain or loss, but scaling
-        } else if( deltaH >= -model_opts$tau & deltaH <= model_opts$tau ) {
+        } else if (deltaH >= -model_opts$tau & deltaH <= model_opts$tau) {
           if (verbose) msg(m,t,paste("scaling: "))
           ly.tot <- nrow(h)
           rl  <- scaleH(t, ly, ly.tot, day.tot, deltaH, Hobs, h, swe, age, H, SWE, model_opts$rho.max, model_opts$k, ts, prec, m)
@@ -698,7 +703,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
        })
        age_layers <- do.call(cbind, age_layers)
 
-       res <- list("SWE" = SWE, "h" = h_layers, "swe" = swe_layers, "age" = age_layers)
+       res <- list("SWE" = SWE, "h" = h_layers, "swe" = swe_layers, "age" = age_layers, dd = nixmass.e$snowpack.dd)
   } else {
        res <- SWE
   }
