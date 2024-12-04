@@ -11,6 +11,7 @@ nixmass(
   region.jo09,
   region.gu19,
   snowclass.st10,
+  layers = FALSE,
   verbose = FALSE
 )
 }
@@ -22,17 +23,22 @@ Dates must be either of class `character`, `Date` or `POSIXct` and given in the 
 \code{YYYY-MM-DD}. No sub-daily resolution is allowed at the moment (see details).}
 
 \item{model}{Defines model for SWE computation. Can be one, several or all of `delta.snow`,
-`delta.snow.dyn_rho_max`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given, all models are computed.}
+`delta.snow.dyn_rho_max`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given, 
+`delta.snow` will be taken.}
 
-\item{alt}{Must be given if one of model is `jo09`. Station elevation in meters.}
+\item{alt}{Must be given in meter if one of model is `jo09`. Ignored otherwise.}
 
-\item{region.jo09}{Must be given if one of model is `jo09`. This must be an integer number 
+\item{region.jo09}{Must be given if one of model is `jo09`, ignored otherwise. This must be an integer number 
 between 1 and 7 of the Swiss region where the station belongs to, according to Fig. 1 in the original reference.}
 
-\item{region.gu19}{If model contains `gu19` this must be one of `italy`, `southwest`, `central` or `southeast` as described in the original reference.}
+\item{region.gu19}{If model contains `gu19` this must be one of `italy`, `southwest`, `central` or `southeast` as described in the original reference.
+#' Ignored if model is not `gu19`.}
 
 \item{snowclass.st10}{Must be given if one of model is `st10`. Must be one of the following character strings: 
-`alpine`, `maritime`, `prairie`, `tundra`, `taiga` as outlined in the original reference.}
+`alpine`, `maritime`, `prairie`, `tundra`, `taiga` as outlined in the original reference. 
+Ignored if model is not `st10`.}
+
+\item{layers}{Logical. Should parameters snow depth, swe and age be returned layerwise?.}
 
 \item{verbose}{Logical. Should additional information be given during runtime?}
 }
