@@ -20,6 +20,7 @@ utils::globalVariables(c("hs"))
 #' measured at one site. The unit must be meters (m). No gaps or NA are allowed.
 #' Dates must be either of class `character`, `Date` or `POSIXct` and given in the format 
 #' \code{YYYY-MM-DD}. No sub-daily resolution is allowed at the moment (see details).
+#' Note that hs has to start with zero.
 #' @param model_opts An empty list which can be populated with model coefficients 
 #' specific to the original delta.snow model (Winkler et al., 2021) or a version, where 
 #' the maximum layer and bulk snow densities are allowed to vary with age (see details).
@@ -684,22 +685,19 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
             x
        })
        h_layers <- do.call(cbind, h_layers)
-       h_layers <- apply(h_layers, 2, function(x) rev(x))
-       
+
        swe_layers <- lapply(swe_layers, function(x) {
             length(x) <- ly
             x
        })
        swe_layers <- do.call(cbind, swe_layers)
-       swe_layers <- apply(swe_layers, 2, function(x) rev(x))
-       
+
        age_layers <- lapply(age_layers, function(x) {
             length(x) <- ly
             x
        })
        age_layers <- do.call(cbind, age_layers)
-       age_layers <- apply(age_layers, 2, function(x) rev(x))
-       
+
        res <- list("SWE" = SWE, "h" = h_layers, "swe" = swe_layers, "age" = age_layers)
   } else {
        res <- SWE
@@ -707,3 +705,4 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   
   return(res)
 }
+
