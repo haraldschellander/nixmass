@@ -94,6 +94,7 @@ NULL
 #' @param snowclass.st10 Must be given if one of model is `st10`. Must be one of the following character strings: 
 #' `alpine`, `maritime`, `prairie`, `tundra`, `taiga` as outlined in the original reference. 
 #' Ignored if model is not `st10`. 
+#' @param layers Logical. Should parameters snow depth, swe and age be returned layerwise?.
 #' @param verbose Logical. Should additional information be given during runtime?
 #'
 #' @return  A list of class \code{nixmass} with components:
@@ -135,7 +136,7 @@ NULL
 #' summary(swe)
 #' 
 nixmass <- function(data, model = c("delta.snow", "delta.snow.dyn_rho_max", "jo09","pi16","st10","gu19"), 
-                    alt, region.jo09, region.gu19, snowclass.st10, verbose = FALSE) {
+                    alt, region.jo09, region.gu19, snowclass.st10, layers = FALSE, verbose = FALSE) {
   
   if (missing(model)) {
     model <- "delta.snow"
@@ -171,9 +172,9 @@ nixmass <- function(data, model = c("delta.snow", "delta.snow.dyn_rho_max", "jo0
   swe <- list()
   for(m in model){
     if(m == "delta.snow"){
-      swe[["swe"]][[m]] <- swe.delta.snow(data, model_opts = list(), dyn_rho_max = FALSE, verbose)
+      swe[["swe"]][[m]] <- swe.delta.snow(data, model_opts = list(), dyn_rho_max = FALSE, layers, verbose)
     } else if (m == "delta.snow.dyn_rho_max") {
-      swe[["swe"]][[m]] <- swe.delta.snow(data, model_opts = list(), dyn_rho_max = TRUE, verbose)
+      swe[["swe"]][[m]] <- swe.delta.snow(data, model_opts = list(), dyn_rho_max = TRUE, layers, verbose)
     } else if (m == "jo09"){
       swe[["swe"]][[m]] <- swe.jo09(data, alt, region.jo09)
     } else if (m == "pi16"){
