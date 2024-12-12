@@ -30,7 +30,7 @@ utils::globalVariables(c("hs"))
 #' @param verbose Should additional information be given during runtime? Can be \code{TRUE} or \code{FALSE}.
 #'
 #' @details
-#' If \code{dyn_rho_max = TRUE}, the bulk snow density varies with layer age. As activation function, 
+#' If \code{dyn_rho_max=TRUE}, the bulk snow density varies with layer age. As activation function, 
 #' `atan` is used, where the S-curve symmetrically transitions from the lower to the upper density bound. 
 #' In that case, \code{model_opts} are extended by a lower density bound \code{rho_l}, 
 #' an upper density bound \code{rho_h}, a slope \code{sigma} and a midpoint \code{mu}, 
@@ -153,10 +153,11 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   if (!is.numeric(data$hs))
     stop("snow depth data must be numeric")
   
-  first_hs <- data |> 
-    dplyr::arrange(as.Date(date)) |> 
-    dplyr::pull(hs) |> 
-    head(1)
+  # first_hs <- data |> 
+  #   dplyr::arrange(as.Date(date)) |> 
+  #   dplyr::pull(hs) |> 
+  #   head(1)
+  first_hs <- data$hs[which.min(as.Date(data$date))]
   if (first_hs != 0)
     stop("snow depth observations must start with 0")
   

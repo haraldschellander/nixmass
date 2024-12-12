@@ -52,7 +52,7 @@ factor \eqn{k2 [m^3kg^{-1}}], determining the importance
 of today's for tomorrow's density.
 }
 \details{
-If \code{dyn_rho_max = TRUE}, the bulk snow density varies with layer age. As activation function,
+If \code{dyn_rho_max=TRUE}, the bulk snow density varies with layer age. As activation function,
 \code{atan} is used, where the S-curve symmetrically transitions from the lower to the upper density bound.
 In that case, \code{model_opts} are extended by a lower density bound \code{rho_l},
 an upper density bound \code{rho_h}, a slope \code{sigma} and a midpoint \code{mu},
