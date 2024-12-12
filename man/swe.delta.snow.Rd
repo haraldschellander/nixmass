@@ -32,10 +32,9 @@ if \code{FALSE}, the original delta.snow model is used.}
 \item{verbose}{Should additional information be given during runtime? Can be \code{TRUE} or \code{FALSE}.}
 }
 \value{
-If \code{layears = FAlSE}, a vector with daily SWE values in mm. If \code{layers=TRUE}, a list with layerwise matrices
+If \code{layers=FALSE}, a vector with daily SWE values in mm. If \code{layers=TRUE}, a list with layerwise matrices
 of the parameters h (snow depth), swe and age is returned additionally to the SWE vector. The matrix holds \code{dates} on the x-axis and
 \code{layers} on the y-axis. swe is in mm, h in m and age in days.
-I
 }
 \description{
 Model daily values of Snow Water Equivalent solely from daily differences of snow depth.
@@ -121,7 +120,7 @@ Sturm, M., Holmgren, J. (1998) "Differences in compaction behavior of three clim
 \cr\cr
 Winkler, M., Schellander, H., and Gruber, S.: Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021, 2021.
 \cr\cr
-Schroeder, M.et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
+Schroeder, M., Prinz, R., Binder, M., Winkler, M., Schellander, H. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
 }
 \author{
 Harald Schellander, Michael Winkler
