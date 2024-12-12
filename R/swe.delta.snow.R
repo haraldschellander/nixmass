@@ -76,10 +76,10 @@ utils::globalVariables(c("hs"))
 #' 
 #' 
 #' @md
-#' @return If \code{layears = FAlSE}, a vector with daily SWE values in mm. If \code{layers=TRUE}, a list with layerwise matrices 
+#' @return If \code{layers=FALSE}, a vector with daily SWE values in mm. If \code{layers=TRUE}, a list with layerwise matrices 
 #' of the parameters h (snow depth), swe and age is returned additionally to the SWE vector. The matrix holds `dates` on the x-axis and 
 #' `layers` on the y-axis. swe is in mm, h in m and age in days. 
-#'  I
+#' 
 #' @export
 #' 
 #' @references Gruber, S. (2014) "Modelling snow water equivalent based on daily snow depths", Masterthesis, Institute for Atmospheric and Cryospheric Sciences, University of Innsbruck.
@@ -90,7 +90,7 @@ utils::globalVariables(c("hs"))
 #' \cr\cr
 #' Winkler, M., Schellander, H., and Gruber, S.: Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021, 2021.
 #' \cr\cr
-#' Schroeder, M.et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
+#' Schroeder, M., Prinz, R., Binder, M., Winkler, M., Schellander, H. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
 #'
 #' @author Harald Schellander, Michael Winkler
 
@@ -153,10 +153,11 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   if (!is.numeric(data$hs))
     stop("snow depth data must be numeric")
   
-  first_hs <- data |> 
-    dplyr::arrange(as.Date(date)) |> 
-    dplyr::pull(hs) |> 
-    head(1)
+  # first_hs <- data |> 
+  #   dplyr::arrange(as.Date(date)) |> 
+  #   dplyr::pull(hs) |> 
+  #   head(1)
+  first_hs <- data$hs[which.min(as.Date(data$date))]
   if (first_hs != 0)
     stop("snow depth observations must start with 0")
   
