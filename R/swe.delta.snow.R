@@ -257,9 +257,9 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
     
     a <- data.frame(t(apply(snowpack.d[(1:ly),], 1, compactH, H.d, k, rho.max, ts, prec, g, model_opts$eta.null)))
     b <- data.frame(rep(0,ly.tot-ly),rep(0,ly.tot-ly),rep(0,ly.tot-ly),rep(0,ly.tot-ly))
-    colnames(a) <- colnames(b) <- c("h","swe","age","rho")
-    nixmass.e$snowpack.dd <<- rbind(a,b)
-    rownames(nixmass.e$snowpack.dd) <<- paste0("dd.layer",1:nrow(nixmass.e$snowpack.dd))
+    colnames(a) <- colnames(b) <- c("h", "swe", "age", "rho")
+    nixmass.e$snowpack.dd <<- rbind(a, b)
+    rownames(nixmass.e$snowpack.dd) <<- paste0("dd.layer", 1:nrow(nixmass.e$snowpack.dd))
     return(nixmass.e$snowpack.dd)
   }
   
@@ -274,14 +274,14 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
     # .dd -> tomorrow
     age.d <- ifelse(x[1] == 0, 0, x[4])
     if (dyn_rho_max)
-      rho.max <- rho_max_dyn(age.d)
+      rho.max.d <- rho_max_dyn(age.d)
     h.dd <- x[1]/(1 + (x[3] * g * ts)/eta.null * exp(-k * x[2]/x[1]))
-    h.dd <- ifelse(x[2]/h.dd > rho.max, x[2]/rho.max, h.dd)
+    h.dd <- ifelse(x[2]/h.dd > rho.max.d, x[2]/rho.max.d, h.dd)
     h.dd <- ifelse(x[1] == 0, 0, h.dd)
     swe.dd  <- x[2]
     age.dd  <- ifelse(x[1] == 0, 0, age.d + 1)
     rho.dd  <- ifelse(x[1] == 0, 0, swe.dd/h.dd)
-    rho.dd  <- ifelse(rho.max - rho.dd < prec, rho.max, rho.dd)
+    rho.dd  <- ifelse(rho.max.d - rho.dd < prec, rho.max.d, rho.dd)
     return(cbind(h = h.dd, swe = swe.dd, age = age.dd, rho = rho.dd))
   } 
   
@@ -397,7 +397,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
     age.d   <- age[,2]  
     if (dyn_rho_max)
       rho.max <- rho_max_dyn(age.d)
-    
+
     # todays overburden   
     swe.hat.d <- numeric(length = length(ly.tot))
     for(i in 1:ly.tot){
@@ -469,7 +469,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
         # if all layers have density > rho.max
         # remove swe.excess from all layers (-> runoff)
         # (this sets density to rho.max)
-        swe.excess <- swe.d[idx.max]-h.dd.cor[idx.max]*rho.max
+        swe.excess <- swe.d[idx.max]-h.dd.cor[idx.max]*rho.max[idx.max]
         swe.d[idx.max] <- swe.d[idx.max] - swe.excess
         if (verbose) msg(m,t,paste(" runoff"))
       }
