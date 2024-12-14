@@ -273,15 +273,15 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
     # .d  -> today
     # .dd -> tomorrow
     age.d <- ifelse(x[1] == 0, 0, x[4])
-    if (dyn_rho_max)
-      rho.max.d <- rho_max_dyn(age.d)
+    if (dyn_rho_max) 
+      rho.max <- rho_max_dyn(age.d)
     h.dd <- x[1]/(1 + (x[3] * g * ts)/eta.null * exp(-k * x[2]/x[1]))
-    h.dd <- ifelse(x[2]/h.dd > rho.max.d, x[2]/rho.max.d, h.dd)
+    h.dd <- ifelse(x[2]/h.dd > rho.max, x[2]/rho.max, h.dd)
     h.dd <- ifelse(x[1] == 0, 0, h.dd)
     swe.dd  <- x[2]
     age.dd  <- ifelse(x[1] == 0, 0, age.d + 1)
     rho.dd  <- ifelse(x[1] == 0, 0, swe.dd/h.dd)
-    rho.dd  <- ifelse(rho.max.d - rho.dd < prec, rho.max.d, rho.dd)
+    rho.dd  <- ifelse(rho.max - rho.dd < prec, rho.max, rho.dd)
     return(cbind(h = h.dd, swe = swe.dd, age = age.dd, rho = rho.dd))
   } 
   
