@@ -591,6 +591,10 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
         
         deltaH <- Hobs[t] - H[t]
         
+        if (is.na(deltaH)) {
+          stop("Snow depth difference could not be calculated. Did you forget to convert hs into meters?")
+        }
+        
         if( deltaH > model_opts$tau ){
           if (verbose) msg(m,t,paste("create new layer",ly+1))
           sigma.null <- deltaH * model_opts$rho.null * g
@@ -599,7 +603,6 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
           } else {
             epsilon <- model_opts$c.ov * sigma.null * exp(-model_opts$k.ov * nixmass.e$snowpack.dd$rho/(model_opts$rho.max - nixmass.e$snowpack.dd$rho))  
           }
-          
           
           h[,2]         <- (1 - epsilon) * h[,2]
           swe[,2]       <- swe[,1]
