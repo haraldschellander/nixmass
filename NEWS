@@ -1,3 +1,12 @@
+nixmass v1.2.4 (release date: 2024-12-14)
+=========================================
+
+Changes: 
+
+* Fixed a bug which led to computational issues, i.e. warnigs about wrong index lengths.
+* Added stop clause, when the input snow depth was probably not converted to meters.
+
+
 nixmass v1.2.3 (release date: 2024-12-04)
 =========================================
 
