@@ -517,8 +517,8 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
     print(unlist(model_opts))
   }
   
-  for (t in 1:day.tot) {
-  #for (t in 2:day.tot) {
+  #for (t in 1:day.tot) {
+  for (t in 2:day.tot) {
     
     if (verbose) msg(m, t, paste0("day ", t, " (", data$date[t], "): "))
     
