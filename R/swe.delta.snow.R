@@ -469,7 +469,11 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
         # if all layers have density > rho.max
         # remove swe.excess from all layers (-> runoff)
         # (this sets density to rho.max)
-        swe.excess <- swe.d[idx.max]-h.dd.cor[idx.max]*rho.max[idx.max]
+        if (dyn_rho_max) {
+          swe.excess <- swe.d[idx.max]-h.dd.cor[idx.max]*rho.max[idx.max]
+        } else {
+          swe.excess <- swe.d[idx.max]-h.dd.cor[idx.max]*rho.max
+        }
         swe.d[idx.max] <- swe.d[idx.max] - swe.excess
         if (verbose) msg(m,t,paste(" runoff"))
       }
