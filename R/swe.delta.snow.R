@@ -109,7 +109,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   
   if (dyn_rho_max) {
     model_opts_defaults <- list(
-      sigma = 0.02986102, mu = 148.3291, rho_h = 588.6178, rho_l = 369.0934,
+      sigma = 0.03, mu = 80, rho_h = 600, rho_l = 380,
       rho.null = 80.73706, c.ov = 0.0005170964, k.ov = 0.3782312,
       k = 0.029297, tau = 0.02356521, eta.null = 8543502, timestep = 24
     )
