@@ -688,27 +688,31 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   
   # compile layers
   if (layers) {
-       h_layers <- lapply(h_layers, function(x) {
-            length(x) <- ly
-            x
-       })
-       h_layers <- do.call(cbind, h_layers)
-
-       swe_layers <- lapply(swe_layers, function(x) {
-            length(x) <- ly
-            x
-       })
-       swe_layers <- do.call(cbind, swe_layers)
-
-       age_layers <- lapply(age_layers, function(x) {
-            length(x) <- ly
-            x
-       })
-       age_layers <- do.call(cbind, age_layers)
-
-       res <- list("SWE" = SWE, "h" = h_layers, "swe" = swe_layers, "age" = age_layers)
+    all_layers <- lapply(h_layers, function(x) {
+      length(x)
+    })
+    max_layers <- max(do.call("c", all_layers), na.rm = TRUE)
+    h_layers <- lapply(h_layers, function(x) {
+      length(x) <- max_layers
+      x
+    })
+    h_layers <- do.call(cbind, h_layers)
+    
+    swe_layers <- lapply(swe_layers, function(x) {
+      length(x) <- max_layers
+      x
+    })
+    swe_layers <- do.call(cbind, swe_layers)
+    
+    age_layers <- lapply(age_layers, function(x) {
+      length(x) <- max_layers
+      x
+    })
+    age_layers <- do.call(cbind, age_layers)
+    
+    res <- list("SWE" = SWE, "h" = h_layers, "swe" = swe_layers, "age" = age_layers)
   } else {
-       res <- SWE
+    res <- SWE
   }
   
   return(res)
