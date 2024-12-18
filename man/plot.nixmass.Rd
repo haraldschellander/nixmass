@@ -4,12 +4,14 @@
 \alias{plot.nixmass}
 \title{Plot modeled SWE values of a nixmass object.}
 \usage{
-\method{plot}{nixmass}(x, title = NULL, ...)
+\method{plot}{nixmass}(x, title = NULL, density = FALSE, ...)
 }
 \arguments{
 \item{x}{nixmass object.}
 
 \item{title}{Main plot title.}
+
+\item{density}{Shall a density plot be created?}
 
 \item{...}{Further graphical parameters may also be supplied as arguments. See \code{\link[graphics]{plot}}.}
 }
@@ -22,5 +24,6 @@ Plot modeled SWE values of a nixmass object.
 \examples{
 data("hsdata")
 plot(nixmass(hsdata, model = "delta.snow"))
+plot(nixmass(hsdata, model = "delta.snow.dyn_rho_max", layers = TRUE), density = TRUE)
 
 }

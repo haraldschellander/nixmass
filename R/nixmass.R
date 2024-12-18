@@ -1,11 +1,14 @@
 # package nixmass
 
 #' @importFrom zoo zoo is.regular
-#' @importFrom lubridate month yday
+#' @importFrom lubridate month yday year
 #' @importFrom dplyr arrange pull right_join mutate as_tibble tibble bind_rows across everything
+#' @importFrom reshape2 melt
+#' @importFrom colorspace scale_fill_continuous_sequential
 NULL
 
 #' @import graphics 
+#' @import ggplot2 
 #' @import utils 
 #' @import stats 
 #' @import grDevices
@@ -240,6 +243,7 @@ summary.nixmass <- function(object, ...){
 #'
 #' @param x nixmass object.
 #' @param title Main plot title.
+#' @param density Shall a density plot be created?
 #' @param ... Further graphical parameters may also be supplied as arguments. See \code{\link[graphics]{plot}}.
 #'
 #' @return Does not return anything. A plot is produced.
@@ -248,8 +252,9 @@ summary.nixmass <- function(object, ...){
 #' @examples
 #' data("hsdata")
 #' plot(nixmass(hsdata, model = "delta.snow"))
+#' plot(nixmass(hsdata, model = "delta.snow.dyn_rho_max", layers = TRUE), density = TRUE)
 #' 
-plot.nixmass <- function(x, title = NULL, ...){
+plot.nixmass <- function(x, title = NULL, density = FALSE, ...){
   
   if(!inherits(x, "nixmass"))
     stop("nixmass: Object must be of class 'nixmass'.")
@@ -258,29 +263,99 @@ plot.nixmass <- function(x, title = NULL, ...){
   if(length(models) == 0)
     stop("nixmass: Cannot plot. No model was computed.")
   
+  if (density) {
+    if (!all(c("h", "swe") %in% names(x$swe[[1]]))) {
+      stop("The layer matrices are missing in the modeled object.")
+    }
+  }
+  
   colors <- c("#E16A86","#C18500","#799D00","#00AB6E","#00A9BE","#6C8EE6","#D169D0")
   
   Sys.setlocale("LC_TIME", locale = "English")
   
-  # define maximum swe for plot outline
-  ymax <- c()
-  for(m in models){
-    ymax <- c(ymax,max(na.omit(c(x$swe[[m]]))))  
+  if (!density) {
+    # define maximum swe for plot outline
+    if (is.null(names(x$swe[[1]]))) {
+      ymax <- list()
+      for(m in models){
+        ymax <- max(na.omit(c(x$swe[[m]])))  
+      }
+      ymax <- max(ymax)
+      plot(as.Date(x$date), xaxt="n", x$swe[[1]], type="n",xlab="",ylab="HS (cm) / SWE (kg/m2)",ylim=c(0,ymax*1.2))
+      n <- 1
+      for(m in models){
+        lines(as.Date(x$date),x$swe[[m]],type="l",col=colors[n])
+        n <- n + 1
+      }
+    } else {
+      ymax <- list()
+      for(m in models){
+        ymax <- max(na.omit(c(x$swe[[m]]$SWE)))  
+      }
+      ymax <- max(ymax)
+      plot(as.Date(x$date), xaxt="n", x$swe[[1]]$SWE, type="n",xlab="",ylab="HS (cm) / SWE (kg/m2)",ylim=c(0,ymax*1.2))
+      n <- 1
+      for(m in models){
+        lines(as.Date(x$date),x$swe[[m]]$SWE,type="l",col=colors[n])
+        n <- n + 1
+      }
+    }
+    axis.Date(1, at = seq(as.Date(x$date[1]), as.Date(x$date[length(x$date)]), by = "2 month"), format = "%b")
+    lines(as.Date(x$date),x$hs*100,type="l",lty=2,col="black")
+    t <- ifelse(is.null(title),"SWE",title) #paste0("Chartreuse (",alts[s],"m)")
+    legend(title=t,"topleft",
+           legend=c(models,"HS"),
+           col=c(colors[1:length(models)],"black"),
+           lty=c(rep(1,length(models)),2), cex=0.8, bg="transparent", bty = "n")
+  } else {
+    # density plot
+    m <- models[1]
+    h <- data.frame(x$swe[[m]][["h"]])
+    swe <- data.frame(x$swe[[m]][["swe"]])
+    dens <- swe / h
+    colnames(h) <- colnames(dens) <- x$date
+    dens.m <- reshape2::melt(dens, variable.name = "date", value.name = "dens")
+    snowpack <- reshape2::melt(h, variable.name = "date", value.name = "h")
+    snowpack$dens <- dens.m$dens
+    snowpack$date <- as.Date(snowpack$date)
+    first.day <- sort(snowpack$date)[1]
+    l <- nrow(subset(snowpack, date == first.day))
+    snowpack$ly <- rep(1:l, length(unique(snowpack$date)))
+    
+    # height of sum of layers
+    snowpack$h.sum <- NA 
+    for(day in unique(snowpack$date)){
+      s <- subset(snowpack, date == day)
+      h.sum <- list()
+      for(i in 1:l){
+        h.sum[[i]] <- sum(s$h[1:i])
+      }
+      h.sum <- do.call("c", h.sum)
+      idx <- as.numeric(rownames(s))
+      snowpack$h.sum[idx] <- h.sum
+    }
+    years <- unique(year(snowpack$date))
+    
+    hdata <- data.frame(date = as.Date(x$date), hs = x$hs)
+    dens_br <- c(seq(0, max(snowpack$dens, na.rm = TRUE), 100), round(max(snowpack$dens, na.rm = TRUE) + 100, -1))
+    p <- ggplot(na.omit(snowpack), aes(date, h * 100)) + 
+      geom_col(aes(fill = dens), width = 1) +
+      scale_x_date(date_labels = "%b", date_breaks = "1 months") +
+      scale_fill_continuous_sequential(palette = "Blues3", 
+                                       breaks = dens_br,
+                                       labels = dens_br,
+                                       limits = c(0, max(dens_br))) +
+      geom_line(data = hdata, aes(date, hs * 100), color = "grey50") +
+      scale_y_continuous(breaks = seq(0, max(hdata$hs) * 110, 20),
+                         labels = seq(0, max(hdata$hs) * 110, 20)) +
+      guides(fill = guide_legend(position = "inside")) +
+      ggtitle(title) +
+      labs(x = "", y = "Snowdepth (cm)", fill = paste0("Density (kgm-3)\n", m)) +
+      theme_bw() %+%
+      theme(legend.position.inside = c(0.2,0.65))
+    return(p)
   }
-  ymax <- max(ymax)
-  plot(as.Date(x$date,),xaxt="n", x$swe[[1]],type="n",xlab="",ylab="HS (cm) / SWE (kg/m2)",ylim=c(0,ymax*1.2))
-  axis.Date(1, at = seq(as.Date(x$date[1]), as.Date(x$date[length(x$date)]), by = "2 month"), format = "%b")
-  n <- 1
-  for(m in models){
-    lines(as.Date(x$date),x$swe[[m]],type="l",col=colors[n])
-    n <- n + 1
-  }
-  lines(as.Date(x$date),x$hs*100,type="l",lty=2,col="black")
-  t <- ifelse(is.null(title),"SWE",title) #paste0("Chartreuse (",alts[s],"m)")
-  legend(title=t,"topleft", 
-         legend=c(models,"HS"),
-         col=c(colors[1:length(models)],"black"), 
-         lty=c(rep(1,length(models)),2), cex=0.8, bg="transparent", bty = "n")
+  
   
   invisible(x)
 }
