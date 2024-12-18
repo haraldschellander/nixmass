@@ -1,3 +1,13 @@
+nixmass v1.2.5 (release date: 2024-12-18)
+=========================================
+
+Changes: 
+
+* The plot function can now return a density plot on demand.
+* Fixed a bug where the number of layers at the end of the winter season determined 
+the returned layer matrices.
+
+
 nixmass v1.2.4 (release date: 2024-12-14)
 =========================================
 
