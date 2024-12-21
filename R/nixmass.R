@@ -65,12 +65,11 @@ NULL
 #' daily snow depth changes or statistically, depending on 
 #' snow depth, elevation, date and climate class.
 #' 
-#' @details 
-#' \code{nixmass}{ This function is a wrapper for the computation of SWE with different models. 
+#' @details This function is a wrapper for the computation of SWE with different models. 
 #' The process based model \code{\link[=swe.delta.snow]{delta.snow}} 
 #' can be chosen in its original formulation (Winkler et al. 20219) and with a dynamically 
 #' increasing maximum bulk snow density (Schroeder et al., 2024), as well as different empirical regression models of 
-#' \code{\link[=swe.jo09]{Jonas},\link[=swe.pi16]{Pistocchi}, \link[=swe.st10]{Sturm}} and \link[=swe.gu19]{Guyennon}}.
+#' \code{\link[=swe.jo09]{Jonas},\link[=swe.pi16]{Pistocchi}, \link[=swe.st10]{Sturm}} and \link[=swe.gu19]{Guyennon}.
 #' For the `delta.snow` models and the ones of `Pistocchi` and `Guyennon`, 
 #' the needed parameters and coefficients from the original references are set as default. 
 #' They can however be changed according to results from other datasets. 

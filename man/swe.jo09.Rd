@@ -23,10 +23,10 @@ A nuemric vector with SWE values for each region in mm.
 Snow Water Equivalent (SWE) is modeled statistically depending on snow depth, altitude, date and region in Switzerland.
 }
 \details{
-\code{swe.jo09}{ This model parametrizes bulk snow density using snow depth, 
+\code{swe.jo09} This model parametrizes bulk snow density using snow depth, 
 season (i.e. month), site altitude and site location. The location is implemented by a 
 density offset according to the region in Switzerland, where the station belongs to. 
-Non computable values are returned as NA.}
+Non computable values are returned as NA.
 }
 \examples{
 data(hsdata)

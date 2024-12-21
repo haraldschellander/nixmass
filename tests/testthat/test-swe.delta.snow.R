@@ -160,6 +160,7 @@ test_that("should correctly calculate SWE values with increasing maximum density
      expect_true(length(result) == nrow(data))
 })
 
+
 test_that("should return matrices for swe, snowdepth and age when layers is TRUE", {
         # Setup a mock dataset
         sample_dates <- seq.Date(from = as.Date("2000-11-01"), to = as.Date("2000-11-07"), by = 1)
@@ -181,4 +182,27 @@ test_that("should return only the swe vector when layers is FALSE", {
         data <- data.frame(date = as.character(sample_dates), hs = sample_data)
         result <- swe.delta.snow(data)
         expect_true(length(result) == nrow(data))
+})
+
+
+test_that("should return valid matrices for swe, snowdepth and age when layers is TRUE", {
+        # Setup a mock dataset
+        sample_dates <- seq.Date(from = as.Date("2000-11-01"), to = as.Date("2000-11-07"), by = 1)
+        sample_data <- c(0, seq(0.1, 0.5, 0.1), 0)
+        data <- data.frame(date = as.character(sample_dates), hs = sample_data)
+        result <- swe.delta.snow(data, layers = TRUE)
+        expect_true(all(na.omit(result$h) >= 0))
+        expect_true(all(na.omit(result$swe) >= 0))
+        expect_true(all(na.omit(result$hage) >= 0))
+})
+
+test_that("should return valid matrices for swe, snowdepth and age when layers is TRUE and dyn.rho.max model", {
+        # Setup a mock dataset
+        sample_dates <- seq.Date(from = as.Date("2000-11-01"), to = as.Date("2000-11-07"), by = 1)
+        sample_data <- c(0, seq(0.1, 0.5, 0.1), 0)
+        data <- data.frame(date = as.character(sample_dates), hs = sample_data)
+        result <- swe.delta.snow(data, dyn_rho_max = TRUE, layers = TRUE)
+        expect_true(all(na.omit(result$h) >= 0))
+        expect_true(all(na.omit(result$swe) >= 0))
+        expect_true(all(na.omit(result$hage) >= 0))
 })

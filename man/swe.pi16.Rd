@@ -24,7 +24,11 @@ A vector with daily SWE values in mm.
 This model parameterizes bulk snow density with day-of-the-year as the only input. It was calibrated for the region of South Tyrol, Italy, and is therefore called ST model in the original reference.
 }
 \details{
-\code{swe.pi16}{ This function uses only the day-of-year (DOY) as parameterization for bulk snow density and hence SWE. Here, the datums in the input data.frame are converted to DOY as defined in the original reference: negative values between 1.10. and 31.12. DOY=-92 at 1.10. In leap years 31.12. has DOY = 0, in non-leap years 31.12. has DOY = -1 with no day being 0. Non computable values are returned as NA.}
+\code{swe.pi16} This function uses only the day-of-year (DOY) as parameterization for bulk snow density 
+and hence SWE. Here, the datums in the input data.frame are converted to DOY as 
+defined in the original reference: negative values between 1.10. and 31.12. DOY=-92 at 1.10. 
+In leap years 31.12. has DOY = 0, in non-leap years 31.12. has DOY = -1 with no day being 0. 
+Non computable values are returned as NA.
 }
 \examples{
 data(hsdata)

@@ -26,7 +26,7 @@ A vector with daily SWE values in mm.
 This model parameterizes bulk snow density with day-of-the-year as the only input similar to \code{\link{swe.pi16}} but adds a quadratic dependance. It was calibrated for the regions of the whole Italian alps, and the subregions South-West, Central and South-East. By setting the cofficients of the empirical regression it can however be used with results from other datasets.
 }
 \details{
-\code{swe.gu19}{ Similar to the model of Pistocchi (2016), this function uses only the day-of-year (DOY) 
+\code{swe.gu19} Similar to the model of Pistocchi (2016), this function uses only the day-of-year (DOY) 
 as parameterization for bulk snow density and hence SWE. In contrast to the latter, here, a quadratic term 
 for DOY was added, to reflect non-linearity in the snow bulk density variability. 
 The datums in the input data.frame are converted to DOY as days spent since November 1st. 
@@ -37,7 +37,7 @@ the Central Italian Alpes or \emph{southeast} for the South-western Italian Alps
 If \code{region.gu19} is set to \emph{myregion}, the coefficients \code{no}, \code{n1} and \code{n2} 
 must be set to values, obtained from a regression between densities and day-of-year from another dataset. 
 It has to have the form density ~ DOY + DOY^2, where DOY is the day-of-year as defined in the original reference. 
-Non computable values are returned as NA.}
+Non computable values are returned as NA.
 }
 \examples{
 data(hsdata)

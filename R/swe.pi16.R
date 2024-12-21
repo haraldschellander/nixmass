@@ -11,7 +11,11 @@
 #' @param K Slope of the linear regression between observed densities and the day-of-year as defined in the original reference. \code{K} is set to 1 as default, which is the value from the original reference. It can however be set to any value according to regression modeling with other datasets. 
 #'
 #' @details
-#' \code{swe.pi16}{ This function uses only the day-of-year (DOY) as parameterization for bulk snow density and hence SWE. Here, the datums in the input data.frame are converted to DOY as defined in the original reference: negative values between 1.10. and 31.12. DOY=-92 at 1.10. In leap years 31.12. has DOY = 0, in non-leap years 31.12. has DOY = -1 with no day being 0. Non computable values are returned as NA.}
+#' \code{swe.pi16} This function uses only the day-of-year (DOY) as parameterization for bulk snow density 
+#' and hence SWE. Here, the datums in the input data.frame are converted to DOY as 
+#' defined in the original reference: negative values between 1.10. and 31.12. DOY=-92 at 1.10. 
+#' In leap years 31.12. has DOY = 0, in non-leap years 31.12. has DOY = -1 with no day being 0. 
+#' Non computable values are returned as NA.
 #' 
 #' @return A vector with daily SWE values in mm.
 #' @export
