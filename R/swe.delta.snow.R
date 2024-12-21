@@ -222,8 +222,9 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   
   
   # helper
-  if (verbose) m <- rep("", day.tot)            # vector of (verbose) messages
-  prec     <- 10^-10                           # precision for arithmetic comparisons [-]
+  m <- rep("", day.tot)                           # vector of (verbose) messages
+  proc <- list()                                  # holds processes for return
+  prec <- 10^-10                                  # precision for arithmetic comparisons [-]
   
   if (layers) {                                   # return parameters layerwise
        h_layers <- list()
@@ -305,7 +306,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   
   
   drenchH <- function(t, ly, ly.tot, day.tot, Hobs, h, swe, age, H, SWE, rho.max, c.ov, k.ov, k, ts, prec, m){
-    if (verbose) msg(m, t, paste("melt "))
+    if (verbose) msg(m, t, proc, paste("melt "))
     
     Hobs.d = Hobs[t]
     h.d = h[, 2]
@@ -334,10 +335,10 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
     if (dyn_rho_max)
       rho.max <- rho_max_dyn(age.d[1:ly])
     if( all(rho.max - swe.d[1:ly]/h.d[1:ly] <= prec) ){
-      if (verbose) msg(m,t,paste("no further compaction "))
+      if (verbose) msg(m,t,proc,paste("no further compaction "))
       
       # produce runoff if sum(h.d) - Hobs.d is still > 0
-      if (verbose) msg(m,t,paste("runoff "))
+      if (verbose) msg(m,t,proc,paste("runoff "))
       scale <- Hobs.d/sum(h.d)
       if (dyn_rho_max) {
         swe_total.d <- c()
@@ -361,7 +362,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
       
       
     } else {
-      if (verbose) msg(m,t,paste("compaction "))
+      if (verbose) msg(m,t,proc,paste("compaction "))
     }
     
     h[,2]   <- h.d
@@ -461,7 +462,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
           swe.excess.all  <- swe.excess.all - swe.res
           i <- i - 1
           if(i<=0 & swe.excess.all > 0){
-            if (verbose) msg(m,t,paste(" runoff"))
+            if (verbose) msg(m,t,proc,paste(" runoff"))
             break
           }
         }
@@ -475,7 +476,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
           swe.excess <- swe.d[idx.max]-h.dd.cor[idx.max]*rho.max
         }
         swe.d[idx.max] <- swe.d[idx.max] - swe.excess
-        if (verbose) msg(m,t,paste(" runoff"))
+        if (verbose) msg(m,t,proc,paste(" runoff"))
       }
     }
     
@@ -507,12 +508,12 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   #-------------------------------------------------------------------------
   # keep track of messages in a vector
   #-------------------------------------------------------------------------
-  msg <- function(m,t,strg){
+  msg <- function(m, t, proc, strg){
     cat(paste(strg))
     if(is.null(m[t])){
-      m[t] <- strg  
+      m[t] <<- strg  
     } else {
-      m[t] <- paste(m[t],strg)
+      m[t] <<- paste(m[t],strg)
     }
   }
   
@@ -523,7 +524,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
   }
   
   for (t in 1:day.tot) {
-    
+ 
     if (verbose) msg(m, t, paste0("day ", t, " (", data$date[t], "): "))
     
     # shift temporary matrices one step back in time
@@ -541,12 +542,15 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
     if ( Hobs[t] == 0 ) {      
       if (t > 1){
         if (Hobs[t-1] == 0) {
-          if (verbose) msg(m, t, paste0(""))        
+          if (verbose) msg(m, t, proc, paste0(""))    
+          if (layers) proc[[t]] <- NA
         } else {
-          if (verbose) msg(m, t, paste0("runoff"))
+          if (verbose) msg(m, t, proc, paste0("runoff"))
+          if (layers) proc[[t]] <- "runoff"
         }        
       } else {
-        if (verbose) msg(m, t, paste0(""))         
+        if (verbose) msg(m, t, proc, paste0(""))   
+        if (layers) proc[[t]] <- NA
       }
       H[t]    <- 0
       SWE[t]  <- 0
@@ -565,7 +569,8 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
       # first snow in/during season
       if ( Hobs[t-1] == 0 ) {
         ly <- 1
-        if (verbose) msg(m,t,paste("produce layer",ly))
+        if (verbose) msg(m,t,proc,paste("produce layer",ly))
+        if (layers) proc[[t]] <- paste("produce layer",ly)
         age[ly,2] <- 1
         h[ly,2]   <- Hobs[t]
         H[t]      <- Hobs[t]
@@ -600,7 +605,8 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
         }
         
         if( deltaH > model_opts$tau ){
-          if (verbose) msg(m,t,paste("create new layer",ly+1))
+          if (verbose) msg(m,t,proc, paste("create new layer",ly+1))
+          if (layers) proc[[t]] <- paste("create new layer",ly+1)
           sigma.null <- deltaH * model_opts$rho.null * g
           if (dyn_rho_max) {
             epsilon <- model_opts$c.ov * sigma.null * exp(-model_opts$k.ov * nixmass.e$snowpack.dd$rho/(rho_max_dyn(age[, 2]) - nixmass.e$snowpack.dd$rho))  
@@ -647,7 +653,8 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
           
           # no mass gain or loss, but scaling
         } else if( deltaH >= -model_opts$tau & deltaH <= model_opts$tau ) {
-          if (verbose) msg(m,t,paste("scaling: "))
+          if (verbose) msg(m,t,proc,paste("scaling: "))
+          if (layers) proc[[t]] <- paste("create new layer",ly+1)
           ly.tot <- nrow(h)
           rl  <- scaleH(t, ly, ly.tot, day.tot, deltaH, Hobs, h, swe, age, H, SWE, model_opts$rho.max, model_opts$k, ts, prec, m)
           h   <- rl$h
@@ -663,7 +670,8 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
           }
           
         } else if ( deltaH < -model_opts$tau ){
-          if (verbose) msg(m,t,paste("drenching: "))
+          if (verbose) msg(m,t,proc,paste("drenching: "))
+          if (layers) proc[[t]] <- paste("drenching: ")
           ly.tot <- nrow(h)
           rl  <- drenchH(t, ly, ly.tot, day.tot, Hobs, h, swe, age, H, SWE, model_opts$rho.max, model_opts$c.ov, model_opts$k.ov, model_opts$k, ts, prec, m)
           h   <- rl$h
@@ -679,11 +687,12 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
           }
           
         } else {
-          if (verbose) msg(m,t,"?")
+          if (verbose) msg(m,t,proc,"?")
+          if (layers) proc[[t]] <- "?"
         }
       }
     } 
-    if (verbose) msg(m,t,"\n")
+    if (verbose) msg(m,t,proc,"\n")
   }
   
   # compile layers
@@ -710,7 +719,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
     })
     age_layers <- do.call(cbind, age_layers)
     
-    res <- list("SWE" = SWE, "h" = h_layers, "swe" = swe_layers, "age" = age_layers)
+    res <- list("SWE" = SWE, "h" = h_layers, "swe" = swe_layers, "age" = age_layers, "processes" = do.call("c", proc))
   } else {
     res <- SWE
   }
