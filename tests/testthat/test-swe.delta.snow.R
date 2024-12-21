@@ -160,5 +160,25 @@ test_that("should correctly calculate SWE values with increasing maximum density
      expect_true(length(result) == nrow(data))
 })
 
+test_that("should return matrices for swe, snowdepth and age when layers is TRUE", {
+        # Setup a mock dataset
+        sample_dates <- seq.Date(from = as.Date("2000-11-01"), to = as.Date("2000-11-07"), by = 1)
+        sample_data <- c(0, seq(0.1, 0.5, 0.1), 0)
+        data <- data.frame(date = as.character(sample_dates), hs = sample_data)
+        result <- swe.delta.snow(data, layers = TRUE)
+        expect_true(inherits(result$SWE, "numeric"))
+        expect_true(inherits(result$h, "matrix"))
+        expect_true(inherits(result$swe, "matrix"))
+        expect_true(inherits(result$age, "matrix"))
+        expect_true(inherits(result$processes, "character"))
+})
 
 
+test_that("should return only the swe vector when layers is FALSE", {
+        # Setup a mock dataset
+        sample_dates <- seq.Date(from = as.Date("2000-11-01"), to = as.Date("2000-11-07"), by = 1)
+        sample_data <- c(0, seq(0.1, 0.5, 0.1), 0)
+        data <- data.frame(date = as.character(sample_dates), hs = sample_data)
+        result <- swe.delta.snow(data)
+        expect_true(length(result) == nrow(data))
+})
