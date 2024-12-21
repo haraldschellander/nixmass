@@ -3,7 +3,7 @@
 #' @importFrom zoo zoo is.regular
 #' @importFrom lubridate month yday year
 #' @importFrom dplyr arrange pull right_join mutate as_tibble tibble bind_rows across everything
-#' @importFrom reshape2 melt
+#' @importFrom tidyr pivot_longer
 #' @importFrom colorspace scale_fill_continuous_sequential
 NULL
 
@@ -270,7 +270,7 @@ plot.nixmass <- function(x, title = NULL, density = FALSE, ...){
   
   colors <- c("#E16A86","#C18500","#799D00","#00AB6E","#00A9BE","#6C8EE6","#D169D0")
   
-  Sys.setlocale("LC_TIME", locale = "English")
+  #Sys.setlocale("LC_TIME", locale = "English")
   
   if (!density) {
     # define maximum swe for plot outline
@@ -313,8 +313,8 @@ plot.nixmass <- function(x, title = NULL, density = FALSE, ...){
     swe <- data.frame(x$swe[[m]][["swe"]])
     dens <- swe / h
     colnames(h) <- colnames(dens) <- x$date
-    dens.m <- reshape2::melt(dens, variable.name = "date", value.name = "dens")
-    snowpack <- reshape2::melt(h, variable.name = "date", value.name = "h")
+    dens.m <- pivot_longer(dens, cols = everything(), names_to = "date", values_to = "dens")
+    snowpack <- pivot_longer(h, cols = everything(), names_to = "date", values_to = "h")
     snowpack$dens <- dens.m$dens
     snowpack$date <- as.Date(snowpack$date)
     first.day <- sort(snowpack$date)[1]
@@ -337,7 +337,7 @@ plot.nixmass <- function(x, title = NULL, density = FALSE, ...){
     
     hdata <- data.frame(date = as.Date(x$date), hs = x$hs)
     dens_br <- c(seq(0, max(snowpack$dens, na.rm = TRUE), 100), round(max(snowpack$dens, na.rm = TRUE) + 100, -1))
-    p <- ggplot(na.omit(snowpack), aes(date, h * 100)) + 
+    p <- ggplot(snowpack, aes(date, h * 100)) + 
       geom_col(aes(fill = dens), width = 1) +
       scale_x_date(date_labels = "%b", date_breaks = "1 months") +
       scale_fill_continuous_sequential(palette = "Blues3", 
