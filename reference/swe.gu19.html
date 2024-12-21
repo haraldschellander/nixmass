@@ -78,7 +78,8 @@ for DOY was added, to reflect non-linearity in the snow bulk density variability
 The datums in the input data.frame are converted to DOY as days spent since November 1st.
 Regression coefficients depend on regions defined in Guyennon et al. (2019), which are <em>italy</em>
 for the Italian Alps, <em>southwest</em> for the South-western Italian Alps, <em>central</em> for
-the Central Italian Alpes or <em>southeast</em> for the South-western Italian Alps. If <code>region.gu19</code> is set to <em>myregion</em>, the coefficients <code>no</code>, <code>n1</code> and <code>n2</code>
+the Central Italian Alpes or <em>southeast</em> for the South-western Italian Alps.</p>
+<p>If <code>region.gu19</code> is set to <em>myregion</em>, the coefficients <code>no</code>, <code>n1</code> and <code>n2</code>
 must be set to values, obtained from a regression between densities and day-of-year from another dataset.
 It has to have the form density ~ DOY + DOY^2, where DOY is the day-of-year as defined in the original reference.
 Non computable values are returned as NA.</p>
