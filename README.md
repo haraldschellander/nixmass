@@ -3,9 +3,9 @@
 <!-- badges: start -->
 <!--[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)-->
 [![CRAN status](https://www.r-pkg.org/badges/version/nixmass)](https://CRAN.R-project.org/package=nixmass)
+![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/nixmass?color=brightgreen)
 ![(https://img.shields.io/github/v/tag/haraldschellander/mevr)](https://img.shields.io/github/v/tag/haraldschellander/nixmass?include_prereleases)
 [![Coverage](https://img.shields.io/codecov/c/github/haraldschellander/nixmass)](https://app.codecov.io/gh/haraldschellander/nixmass)
-![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/nixmass)
 <!-- badges: end -->
 
 R-package with functions for Snow Water Equivalent Modeling with the $\Delta\text{SNOW}$ Model and Empirical Regression Models.
