@@ -566,7 +566,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
       # there is snow
     } else if (Hobs[t] > 0 ) {
       
-      # first snow in/during season
+      # first snow of snowfall event(s)
       if ( Hobs[t-1] == 0 ) {
         ly <- 1
         if (verbose) msg(m, t, paste("produce layer", ly))
@@ -601,7 +601,7 @@ swe.delta.snow <- function(data, model_opts = list(), dyn_rho_max = TRUE, layers
         deltaH <- Hobs[t] - H[t]
         
         if (is.na(deltaH)) {
-          stop("Snow depth difference could not be calculated. Did you forget to convert hs into meters?")
+          stop("Snow depth difference could not be calculated. Did you forget to convert hs to meters?")
         }
         
         if( deltaH > model_opts$tau ){

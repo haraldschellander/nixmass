@@ -51,3 +51,4 @@ Changes:
 
 * Large preallocated matrices for keeping track of the main variables have been replaced by small matrices. They comprise of only three timesteps, i.e. timestep - 1, timestep, and timestep + 1. This makes computation much faster, and there is no more restriction of the data series length.
 * The summary function has now a prettier output.
+
