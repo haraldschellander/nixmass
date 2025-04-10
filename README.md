@@ -14,6 +14,7 @@ Snow water equivalent can be modeled either with the process based $\Delta\text{
 
 Note that there exists a very [similar model](https://github.com/jannefiluren/HS2SWE) which has many ideas in common with the $\Delta\text{SNOW}$ model. 
 
+
 ## Installation
 
 The easiest way to get nixmass is to install it from CRAN
