@@ -6,7 +6,8 @@
 \usage{
 nixmass(
   data,
-  model = c("delta.snow", "delta.snow.dyn_rho_max", "jo09", "pi16", "st10", "gu19"),
+  model = c("delta.snow", "delta.snow.dyn_rho_max", "hs2swe", "jo09", "pi16", "st10",
+    "gu19"),
   alt,
   region.jo09,
   region.gu19,
@@ -16,26 +17,26 @@ nixmass(
 )
 }
 \arguments{
-\item{data}{A data.frame with at least two columns named \code{date} and \code{hs}. 
-They should contain date and corresponding daily observations of snow depth \eqn{hs \ge 0} 
+\item{data}{A data.frame with at least two columns named \code{date} and \code{hs}.
+They should contain date and corresponding daily observations of snow depth \eqn{hs \ge 0}
 measured at one site. The unit must be meters (m). No gaps or NA are allowed.
-Dates must be either of class `character`, `Date` or `POSIXct` and given in the format 
+Dates must be either of class `character`, `Date` or `POSIXct` and given in the format
 \code{YYYY-MM-DD}. No sub-daily resolution is allowed at the moment (see details).}
 
 \item{model}{Defines model for SWE computation. Can be one, several or all of `delta.snow`,
-`delta.snow.dyn_rho_max`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given, 
+`delta.snow.dyn_rho_max`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given,
 `delta.snow` will be taken.}
 
 \item{alt}{Must be given in meter if one of model is `jo09`. Ignored otherwise.}
 
-\item{region.jo09}{Must be given if one of model is `jo09`, ignored otherwise. This must be an integer number 
+\item{region.jo09}{Must be given if one of model is `jo09`, ignored otherwise. This must be an integer number
 between 1 and 7 of the Swiss region where the station belongs to, according to Fig. 1 in the original reference.}
 
 \item{region.gu19}{If model contains `gu19` this must be one of `italy`, `southwest`, `central` or `southeast` as described in the original reference.
 #' Ignored if model is not `gu19`.}
 
-\item{snowclass.st10}{Must be given if one of model is `st10`. Must be one of the following character strings: 
-`alpine`, `maritime`, `prairie`, `tundra`, `taiga` as outlined in the original reference. 
+\item{snowclass.st10}{Must be given if one of model is `st10`. Must be one of the following character strings:
+`alpine`, `maritime`, `prairie`, `tundra`, `taiga` as outlined in the original reference.
 Ignored if model is not `st10`.}
 
 \item{layers}{Logical. Should parameters snow depth, swe and age be returned layerwise?.}
@@ -49,29 +50,29 @@ A list of class \code{nixmass} with components:
 \item{hs}{Vector of given snow depth values used to compute SWE. }
 }
 \description{
-Snow Water Equivalent (SWE) is modeled either exclusively from 
-daily snow depth changes or statistically, depending on 
+Snow Water Equivalent (SWE) is modeled either exclusively from
+daily snow depth changes or statistically, depending on
 snow depth, elevation, date and climate class.
 }
 \details{
-This function is a wrapper for the computation of SWE with different models. 
-The process based model \code{\link[=swe.delta.snow]{delta.snow}} 
-can be chosen in its original formulation (Winkler et al. 20219) and with a dynamically 
-increasing maximum bulk snow density (Schroeder et al., 2024), as well as different empirical regression models of 
+This function is a wrapper for the computation of SWE with different models.
+The process based model \code{\link[=swe.delta.snow]{delta.snow}}
+can be chosen in its original formulation (Winkler et al. 20219) and with a dynamically
+increasing maximum bulk snow density (Schroeder et al., 2024), as well as different empirical regression models of
 \code{\link[=swe.jo09]{Jonas},\link[=swe.pi16]{Pistocchi}, \link[=swe.st10]{Sturm}} and \link[=swe.gu19]{Guyennon}.
-For the `delta.snow` models and the ones of `Pistocchi` and `Guyennon`, 
-the needed parameters and coefficients from the original references are set as default. 
-They can however be changed according to results from other datasets. 
-For the other models of `Jonas` and `Sturm` regression coefficients are fixed. 
+For the `delta.snow` models and the ones of `Pistocchi` and `Guyennon`,
+the needed parameters and coefficients from the original references are set as default.
+They can however be changed according to results from other datasets.
+For the other models of `Jonas` and `Sturm` regression coefficients are fixed.
 
-Computation is quite fast and there does not exist any restriction 
-regarding the length of the data. However, if many years have to be modeled at once, 
+Computation is quite fast and there does not exist any restriction
+regarding the length of the data. However, if many years have to be modeled at once,
 it is recommended to split the computation into single years, separated by zero snow depth values.
 }
 \examples{
-# Load example data with realistic snow depth values 
+# Load example data with realistic snow depth values
 # from a station at 600 meters in the northern Alps
-# Note that the winter season is set to an arbitrary date 
+# Note that the winter season is set to an arbitrary date
 # to mask its origin
 data("hsdata")
 o <- nixmass(hsdata, model="delta.snow",verbose=TRUE)
@@ -88,11 +89,11 @@ summary(swe)
 }
 \references{
 Guyennon, N., Valt, M., Salerno, F., Petrangeli, A., Romano, E. (2019) 'Estimating the snow water equivalent from snow depth measurements in the Italian Alps', Cold Regions Science and Technology. Elsevier, 167 (August), p. 102859. doi: 10.1016/j.coldregions.2019.102859.
-\cr\cr     
+\cr\cr
 Jonas, T., Marty, C. and Magnusson, J. (2009) "Estimating the snow water equivalent from snow depth measurements in the Swiss Alps"", Journal of Hydrology, 378(1 - 2), pp. 161 - 167. doi: 10.1016/j.jhydrol.2009.09.021.
-\cr\cr 	
+\cr\cr
 Pistocchi, A. (2016) "Simple estimation of snow density in an Alpine region", Journal of Hydrology: Regional Studies. Elsevier B.V., 6(Supplement C), pp. 82 - 89. doi: 10.1016/j.ejrh.2016.03.004.
-\cr\cr 	
+\cr\cr
 Sturm, M. et al. (2010) "Estimating Snow Water Equivalent Using Snow Depth Data and Climate Classes", Journal of Hydrometeorology, 11(6), pp. 1380 - 1394. doi: 10.1175/2010JHM1202.1.
 \cr\cr
 Winkler, M., Schellander, H., and Gruber, S.: Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021, 2021.
