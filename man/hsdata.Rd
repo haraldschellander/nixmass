@@ -5,11 +5,11 @@
 \alias{hsdata}
 \title{Daily snow depth data for a northern alpine station}
 \format{
-A `data.frame` named \code{data} with columns \code{date} and \code{hs}. 
+A `data.frame` named \code{data} with columns \code{date} and \code{hs}.
 \describe{
-\item{date}{The date column contains character strings of the format "YYYY-MM-DD" 
-and is of class \code{character}}. 
-\item{hs}{The hs column holds daily observed snow depths 
+\item{date}{The date column contains character strings of the format "YYYY-MM-DD"
+and is of class \code{character}}.
+\item{hs}{The hs column holds daily observed snow depths
 in meters and is of class \code{numeric}.}
 }
 }
@@ -17,14 +17,14 @@ in meters and is of class \code{numeric}.}
 data(hsdata)
 }
 \description{
-Gapless daily snow depth observations for a winter season from 1.8. - 31.7. from a station situated in the northern earstern alps at an altitude of 600 m. For anonymization the years are intentionally set to 1900 - 1901. 
-This data series is free of gaps with a minimum of 0 and a maximum of 1.3 meters. 
-It is intended to be used as is as input data for the package \code{\link{nixmass}} 
-to calculate snow water equivalent and bulk snow density with the delta.snow method 
+Gapless daily snow depth observations for a winter season from 1.8. - 31.7. from a station situated in the northern earstern alps at an altitude of 600 m. For anonymization the years are intentionally set to 1900 - 1901.
+This data series is free of gaps with a minimum of 0 and a maximum of 1.3 meters.
+It is intended to be used as is as input data for the package \code{\link{nixmass}}
+to calculate snow water equivalent and bulk snow density with the delta.snow method
 and several empirical regression models from the literature.
 }
 \examples{
-## Load example data 
+## Load example data
 data("hsdata")
 
 ## explore dataset
