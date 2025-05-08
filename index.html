@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Snow Water Equivalent Modeling with the Delta.snow Model and Empirical Regression Models">
-<meta name="description" content="Snow water equivalent is modeled with the process based delta.snow model and empirical regression models using relationships between density and diverse at-site parameters. The methods are described in Winkler et al. (2021) &lt;doi:10.5194/hess-25-1165-2021&gt;, Guyennon et al. (2019) &lt;doi:10.1016/j.coldregions.2019.102859&gt;, Pistocchi (2016) &lt;doi:10.1016/j.ejrh.2016.03.004&gt;, Jonas et al. (2009) &lt;doi:10.1016/j.jhydrol.2009.09.021&gt; and Sturm et al. (2010) &lt;doi:10.1175/2010JHM1202.1&gt;.">
-<meta property="og:description" content="Snow water equivalent is modeled with the process based delta.snow model and empirical regression models using relationships between density and diverse at-site parameters. The methods are described in Winkler et al. (2021) &lt;doi:10.5194/hess-25-1165-2021&gt;, Guyennon et al. (2019) &lt;doi:10.1016/j.coldregions.2019.102859&gt;, Pistocchi (2016) &lt;doi:10.1016/j.ejrh.2016.03.004&gt;, Jonas et al. (2009) &lt;doi:10.1016/j.jhydrol.2009.09.021&gt; and Sturm et al. (2010) &lt;doi:10.1175/2010JHM1202.1&gt;.">
+<meta name="description" content="Snow water equivalent is modeled with the process based models delta.snow and HS2SWE and empirical regression models using relationships between density and diverse at-site parameters. The methods are described in Winkler et al. (2021) &lt;doi:10.5194/hess-25-1165-2021&gt;, Guyennon et al. (2019) &lt;doi:10.1016/j.coldregions.2019.102859&gt;, Pistocchi (2016) &lt;doi:10.1016/j.ejrh.2016.03.004&gt;, Jonas et al. (2009) &lt;doi:10.1016/j.jhydrol.2009.09.021&gt; and Sturm et al. (2010) &lt;doi:10.1175/2010JHM1202.1&gt;.">
+<meta property="og:description" content="Snow water equivalent is modeled with the process based models delta.snow and HS2SWE and empirical regression models using relationships between density and diverse at-site parameters. The methods are described in Winkler et al. (2021) &lt;doi:10.5194/hess-25-1165-2021&gt;, Guyennon et al. (2019) &lt;doi:10.1016/j.coldregions.2019.102859&gt;, Pistocchi (2016) &lt;doi:10.1016/j.ejrh.2016.03.004&gt;, Jonas et al. (2009) &lt;doi:10.1016/j.jhydrol.2009.09.021&gt; and Sturm et al. (2010) &lt;doi:10.1175/2010JHM1202.1&gt;.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">nixmass</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,9 +50,9 @@
 <!-- badges: start -->
 <!--[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)-->
 
-<p>R-package with functions for Snow Water Equivalent Modeling with the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">SNOW</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{SNOW}</annotation></semantics></math> Model and some Empirical Regression Models.</p>
-<p>Snow water equivalent can be modeled either with the process based <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">SNOW</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{SNOW}</annotation></semantics></math> model, or with empirical regression models, which use relationships between density and diverse at-site parameters. The <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">SNOW</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{SNOW}</annotation></semantics></math> model is described in <a href="https://doi.org/10.5194/hess-25-1165-2021" class="external-link">Winkler et al. (2021)</a>, the empirical regression models in <a href="https://doi.org/10.1016/j.coldregions.2019.102859" class="external-link">Guyennon et al. (2019)</a>, <a href="https://doi.org/10.1016/j.ejrh.2016.03.0049" class="external-link">Pistocchi (2016)</a>, <a href="https://doi.org/10.1016/j.jhydrol.2009.09.021" class="external-link">Jonas et al. (2009)</a> and <a href="https://doi.org/10.1175/2010JHM1202.1" class="external-link">Sturm et al. (2010)</a>.</p>
-<p>Note that there exists a very <a href="https://github.com/jannefiluren/HS2SWE" class="external-link">similar model</a> which has many ideas in common with the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">SNOW</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{SNOW}</annotation></semantics></math> model.</p>
+<p>R-package with functions for Snow Water Equivalent Modeling with the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">SNOW</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{SNOW}</annotation></semantics></math> Model, the HS2SWE Model and some Empirical Regression Models.</p>
+<p>Snow water equivalent can be modeled either with the process based models <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">SNOW</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{SNOW}</annotation></semantics></math> and HS2SWE, or with empirical regression models, which use relationships between density and diverse at-site parameters. The <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">SNOW</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{SNOW}</annotation></semantics></math> model is described in <a href="https://doi.org/10.5194/hess-25-1165-2021" class="external-link">Winkler et al. (2021)</a>, the empirical regression models in <a href="https://doi.org/10.1016/j.coldregions.2019.102859" class="external-link">Guyennon et al. (2019)</a>, <a href="https://doi.org/10.1016/j.ejrh.2016.03.0049" class="external-link">Pistocchi (2016)</a>, <a href="https://doi.org/10.1016/j.jhydrol.2009.09.021" class="external-link">Jonas et al. (2009)</a> and <a href="https://doi.org/10.1175/2010JHM1202.1" class="external-link">Sturm et al. (2010)</a>.</p>
+<!-- Note that there exists a very [similar model](https://github.com/jannefiluren/HS2SWE) which has many ideas in common with the $\Delta\text{SNOW}$ model. -->
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -94,7 +94,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Harald Schellander <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Harald Schellander <br><small class="roles"> Author, maintainer </small>   </li>
 <li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
@@ -116,7 +116,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>
