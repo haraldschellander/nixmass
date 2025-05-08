@@ -2,6 +2,7 @@
 
 S3method(plot,nixmass)
 S3method(summary,nixmass)
+export(hs2swe)
 export(nixmass)
 export(swe.delta.snow)
 export(swe.gu19)
