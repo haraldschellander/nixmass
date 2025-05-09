@@ -11,3 +11,4 @@ codecov.yml
 ^dev$
 ^revdep$
 ^cran-comments\.md$
+^CRAN-SUBMISSION$
