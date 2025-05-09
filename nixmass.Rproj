@@ -15,11 +15,7 @@ LaTeX: pdfLaTeX
 
 BuildType: Package
 PackageUseDevtools: Yes
-<<<<<<< Updated upstream
-PackagePath: C:/Users/hschellander/Documents/local_projects/r-packages/nixmass/
-=======
 PackagePath: C:/Users/hschellander/Documents/local_projects/r-packages/nixmass
->>>>>>> Stashed changes
 PackageInstallArgs: --no-multiarch --with-keep.source
 PackageCheckArgs: --as-cran
 PackageRoxygenize: rd,collate,namespace
