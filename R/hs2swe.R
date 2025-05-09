@@ -1,11 +1,10 @@
-# translation of https://github.com/jannefiluren/HS2SWE/blob/main/HS2SWE.m to R
 #' A model which translates snow depth observations to snow water equivalents
 #'
-#' The HS2SWE model is based on similar principles as the \code{\link{swe.delta.snow}} model.
+#' The HS2SWE model is based on similar principles as the \code{\link[=swe.delta.snow]{delta.snow}} model.
 #' It is described in the following publication:
 #' Magnusson, J., B. Cluzet., L. Quéno, R. Mott, M. Oberrauch, G. Mazzotti, C. Marty, T. Jonas; 2025; Evaluating methods to estimate the water equivalent of new snow from daily snow depth recordings; Cold Regions Science and Technology, 233; 10.1016/j.coldregions.2025.104435.
 #'
-#' The model is also available as matlab function, python package or in as R function
+#' The model is also available as matlab function, python package or as R function
 #' that accepts a slightly different input from https://github.com/oshd-slf/HS2SWE
 #'
 #'
@@ -29,7 +28,7 @@
 #' @param g The gravitational acceleration in m/s². Default is 9.81 m/s².
 #' @param dt The time step in seconds. Default is 86400 seconds (1 day).
 #'
-#' @returns A numeric vector of simulated SWE in mm.
+#' @return A numeric vector of simulated SWE in mm.
 #' @export
 #'
 #' @examples

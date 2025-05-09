@@ -61,12 +61,12 @@ Dates must be either of class `character`, `Date` or `POSIXct` and given in the 
 A numeric vector of simulated SWE in mm.
 }
 \description{
-The HS2SWE model is based on similar principles as the \code{\link{swe.delta.snow}} model.
+The HS2SWE model is based on similar principles as the \code{\link[=swe.delta.snow]{delta.snow}} model.
 It is described in the following publication:
 Magnusson, J., B. Cluzet., L. Quéno, R. Mott, M. Oberrauch, G. Mazzotti, C. Marty, T. Jonas; 2025; Evaluating methods to estimate the water equivalent of new snow from daily snow depth recordings; Cold Regions Science and Technology, 233; 10.1016/j.coldregions.2025.104435.
 }
 \details{
-The model is also available as matlab function, python package or in as R function
+The model is also available as matlab function, python package or as R function
 that accepts a slightly different input from https://github.com/oshd-slf/HS2SWE
 }
 \examples{
