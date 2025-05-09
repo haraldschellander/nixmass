@@ -9,6 +9,7 @@ swe.delta.snow(
   model_opts = list(),
   dyn_rho_max = TRUE,
   layers = FALSE,
+  strict_mode = TRUE,
   verbose = FALSE
 )
 }
@@ -29,13 +30,15 @@ if \code{FALSE}, the original delta.snow model is used.}
 
 \item{layers}{Should parameters snow depth, swe and age be returned layerwise? Can be \code{TRUE} or \code{FALSE}.}
 
+\item{strict_mode}{Logical. If \code{TRUE}, the function checks if the data is strictly regular and
+if the snow depth series starts with zero.}
+
 \item{verbose}{Should additional information be given during runtime? Can be \code{TRUE} or \code{FALSE}.}
 }
 \value{
-If \code{layears = FAlSE}, a vector with daily SWE values in mm. If \code{layers=TRUE}, a list with layerwise matrices
-of the parameters h (snow depth), swe and age is returned additionally to the SWE vector. The matrix holds \code{dates} on the x-axis and
-\code{layers} on the y-axis. swe is in mm, h in m and age in days.
-I
+If \code{layers=FALSE}, a vector with daily SWE values in mm. If \code{layers=TRUE}, a list with layerwise matrices
+of the parameters h (snow depth), swe and age is returned additionally to the SWE vector. The matrix rows correspond to \code{layers},
+columns correspond to \code{dates}. swe is in mm, h in m and age in days.
 }
 \description{
 Model daily values of Snow Water Equivalent solely from daily differences of snow depth.
@@ -106,9 +109,9 @@ data(hsdata, package = "nixmass")
 swe_dyn <- swe.delta.snow(hsdata)
 swe <- swe.delta.snow(hsdata, dyn_rho_max = FALSE)
 plot(seq_along(hsdata$date), swe_dyn, type = "l", ylab = "SWE (mm) / hs (cm)", xlab = "day")
-lines(seq_along(hsdata$date), swe, type = "l", col = "red") 
-lines(seq_along(hsdata$date), hsdata$hs * 100, type = "l", lty = 2, col = "grey30") 
-legend(title = "delta.snow", "topleft", legend = c("SWE dyn", "SWE", "HS"), 
+lines(seq_along(hsdata$date), swe, type = "l", col = "red")
+lines(seq_along(hsdata$date), hsdata$hs * 100, type = "l", lty = 2, col = "grey30")
+legend(title = "delta.snow", "topleft", legend = c("SWE dyn", "SWE", "HS"),
  col = c("black", "red", "grey30"), lty = c(1, 1, 2))
 
 }

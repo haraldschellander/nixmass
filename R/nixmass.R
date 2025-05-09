@@ -61,19 +61,21 @@ NULL
 #' daily snow depth changes or statistically, depending on
 #' snow depth, elevation, date and climate class.
 #'
-#' @details This function is a wrapper for the computation of SWE with different models.
+#' @details This function is a wrapper for the simulation of SWE with different models.
 #' The process based model \code{\link[=swe.delta.snow]{delta.snow}}
 #' can be chosen in its original formulation (Winkler et al. 20219) and with a dynamically
-#' increasing maximum bulk snow density (Schroeder et al., 2024), as well as different empirical regression models of
+#' increasing maximum bulk snow density (Schroeder et al., 2024). The \code{\link[=hs2swe]{hs2swe}}
+#' model is an alternative formulation of the same physical concept used in delta.snow (Magnusson, et al., 2025).
+#' Some empirical regression models can also be chosen:
 #' \code{\link[=swe.jo09]{Jonas},\link[=swe.pi16]{Pistocchi}, \link[=swe.st10]{Sturm}} and \link[=swe.gu19]{Guyennon}.
-#' For the `delta.snow` models and the ones of `Pistocchi` and `Guyennon`,
+#' For the `delta.snow` and `hs2swe` models and the ones of `Pistocchi` and `Guyennon`,
 #' the needed parameters and coefficients from the original references are set as default.
 #' They can however be changed according to results from other datasets.
 #' For the other models of `Jonas` and `Sturm` regression coefficients are fixed.
 #'
 #' Computation is quite fast and there does not exist any restriction
 #' regarding the length of the data. However, if many years have to be modeled at once,
-#' it is recommended to split the computation into single years, separated by zero snow depth values.
+#' it is recommended to split the computation into single years.
 #'
 #' @param data A data.frame with at least two columns named \code{date} and \code{hs}.
 #' They should contain date and corresponding daily observations of snow depth \eqn{hs \ge 0}
@@ -81,7 +83,7 @@ NULL
 #' Dates must be either of class `character`, `Date` or `POSIXct` and given in the format
 #' \code{YYYY-MM-DD}. No sub-daily resolution is allowed at the moment (see details).
 #' @param model Defines model for SWE computation. Can be one, several or all of `delta.snow`,
-#' `delta.snow.dyn_rho_max`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given,
+#' `delta.snow.dyn_rho_max`, `hs2swe`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given,
 #' `delta.snow` will be taken.
 #' @param alt Must be given in meter if one of model is `jo09`. Ignored otherwise.
 #' @param region.jo09 Must be given if one of model is `jo09`, ignored otherwise. This must be an integer number
@@ -92,6 +94,8 @@ NULL
 #' `alpine`, `maritime`, `prairie`, `tundra`, `taiga` as outlined in the original reference.
 #' Ignored if model is not `st10`.
 #' @param layers Logical. Should parameters snow depth, swe and age be returned layerwise?.
+#' @param strict_mode Logical. If `TRUE`, the function checks if the data is strictly regular and
+#' if the snow depth series starts with zero.
 #' @param verbose Logical. Should additional information be given during runtime?
 #'
 #' @return  A list of class \code{nixmass} with components:
@@ -148,6 +152,7 @@ nixmass <- function(
   region.gu19,
   snowclass.st10,
   layers = FALSE,
+  strict_mode = TRUE,
   verbose = FALSE
 ) {
   if (missing(model)) {
@@ -188,6 +193,7 @@ nixmass <- function(
         model_opts = list(),
         dyn_rho_max = FALSE,
         layers,
+        strict_mode,
         verbose
       )
     } else if (m == "delta.snow.dyn_rho_max") {
@@ -195,6 +201,7 @@ nixmass <- function(
         data,
         model_opts = list(),
         dyn_rho_max = TRUE,
+        strict_mode,
         layers,
         verbose
       )
