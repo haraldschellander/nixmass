@@ -72,6 +72,7 @@ of today's for tomorrow's density.</p>
 <span>  model_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  dyn_rho_max <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  layers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  strict_mode <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -104,16 +105,20 @@ if <code>FALSE</code>, the original delta.snow model is used.</p></dd>
 <dd><p>Should parameters snow depth, swe and age be returned layerwise? Can be <code>TRUE</code> or <code>FALSE</code>.</p></dd>
 
 
+<dt id="arg-strict-mode">strict_mode<a class="anchor" aria-label="anchor" href="#arg-strict-mode"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, the function checks if the data is strictly regular and
+if the snow depth series starts with zero.</p></dd>
+
+
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Should additional information be given during runtime? Can be <code>TRUE</code> or <code>FALSE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>If <code>layears = FAlSE</code>, a vector with daily SWE values in mm. If <code>layers=TRUE</code>, a list with layerwise matrices
-of the parameters h (snow depth), swe and age is returned additionally to the SWE vector. The matrix holds <code>dates</code> on the x-axis and
-<code>layers</code> on the y-axis. swe is in mm, h in m and age in days.
-I</p>
+    <p>If <code>layers=FALSE</code>, a vector with daily SWE values in mm. If <code>layers=TRUE</code>, a list with layerwise matrices
+of the parameters h (snow depth), swe and age is returned additionally to the SWE vector. The matrix rows correspond to <code>layers</code>,
+columns correspond to <code>dates</code>. swe is in mm, h in m and age in days.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -176,9 +181,9 @@ Schroeder, M.et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACI
 <span class="r-in"><span><span class="va">swe_dyn</span> <span class="op">&lt;-</span> <span class="fu">swe.delta.snow</span><span class="op">(</span><span class="va">hsdata</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">swe</span> <span class="op">&lt;-</span> <span class="fu">swe.delta.snow</span><span class="op">(</span><span class="va">hsdata</span>, dyn_rho_max <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">hsdata</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>, <span class="va">swe_dyn</span>, type <span class="op">=</span> <span class="st">"l"</span>, ylab <span class="op">=</span> <span class="st">"SWE (mm) / hs (cm)"</span>, xlab <span class="op">=</span> <span class="st">"day"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">hsdata</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>, <span class="va">swe</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> </span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">hsdata</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>, <span class="va">hsdata</span><span class="op">$</span><span class="va">hs</span> <span class="op">*</span> <span class="fl">100</span>, type <span class="op">=</span> <span class="st">"l"</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"grey30"</span><span class="op">)</span> </span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"delta.snow"</span>, <span class="st">"topleft"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SWE dyn"</span>, <span class="st">"SWE"</span>, <span class="st">"HS"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">hsdata</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>, <span class="va">swe</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">hsdata</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>, <span class="va">hsdata</span><span class="op">$</span><span class="va">hs</span> <span class="op">*</span> <span class="fl">100</span>, type <span class="op">=</span> <span class="st">"l"</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"grey30"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"delta.snow"</span>, <span class="st">"topleft"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SWE dyn"</span>, <span class="st">"SWE"</span>, <span class="st">"HS"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span> col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"red"</span>, <span class="st">"grey30"</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="swe.delta.snow-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>

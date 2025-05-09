@@ -52,6 +52,7 @@ snow depth, elevation, date and climate class.</p>
 <span>  <span class="va">region.gu19</span>,</span>
 <span>  <span class="va">snowclass.st10</span>,</span>
 <span>  layers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  strict_mode <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -70,7 +71,7 @@ Dates must be either of class `character`, `Date` or `POSIXct` and given in the 
 
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
 <dd><p>Defines model for SWE computation. Can be one, several or all of `delta.snow`,
-`delta.snow.dyn_rho_max`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given,
+`delta.snow.dyn_rho_max`, `hs2swe`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given,
 `delta.snow` will be taken.</p></dd>
 
 
@@ -98,6 +99,11 @@ Ignored if model is not `st10`.</p></dd>
 <dd><p>Logical. Should parameters snow depth, swe and age be returned layerwise?.</p></dd>
 
 
+<dt id="arg-strict-mode">strict_mode<a class="anchor" aria-label="anchor" href="#arg-strict-mode"></a></dt>
+<dd><p>Logical. If `TRUE`, the function checks if the data is strictly regular and
+if the snow depth series starts with zero.</p></dd>
+
+
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Logical. Should additional information be given during runtime?</p></dd>
 
@@ -117,18 +123,20 @@ Ignored if model is not `st10`.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function is a wrapper for the computation of SWE with different models.
+    <p>This function is a wrapper for the simulation of SWE with different models.
 The process based model <code><a href="swe.delta.snow.html">delta.snow</a></code>
 can be chosen in its original formulation (Winkler et al. 20219) and with a dynamically
-increasing maximum bulk snow density (Schroeder et al., 2024), as well as different empirical regression models of
+increasing maximum bulk snow density (Schroeder et al., 2024). The <code><a href="hs2swe.html">hs2swe</a></code>
+model is an alternative formulation of the same physical concept used in delta.snow (Magnusson, et al., 2025).
+Some empirical regression models can also be chosen:
 <code><a href="swe.jo09.html">Jonas</a>,<a href="swe.pi16.html">Pistocchi</a>, <a href="swe.st10.html">Sturm</a></code> and <a href="swe.gu19.html">Guyennon</a>.
-For the `delta.snow` models and the ones of `Pistocchi` and `Guyennon`,
+For the `delta.snow` and `hs2swe` models and the ones of `Pistocchi` and `Guyennon`,
 the needed parameters and coefficients from the original references are set as default.
 They can however be changed according to results from other datasets.
 For the other models of `Jonas` and `Sturm` regression coefficients are fixed.</p>
 <p>Computation is quite fast and there does not exist any restriction
 regarding the length of the data. However, if many years have to be modeled at once,
-it is recommended to split the computation into single years, separated by zero snow depth values.</p>
+it is recommended to split the computation into single years.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
