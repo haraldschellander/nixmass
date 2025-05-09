@@ -2,3 +2,12 @@
 ^\.Rproj\.user$
 .github
 codecov.yml
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
+^optimisation$
+^validation$
+^dev$
+^revdep$
+^cran-comments\.md$
