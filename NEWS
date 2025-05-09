@@ -1,10 +1,18 @@
+nixmass v1.3.1 (release date: 2025-05-09)
+=========================================
+
+Changes: 
+
+* Included the `strict_mode` argument in the delta.snow models which does not perform 
+strict date checking and allows for zero snow depth values at the beginnig of the time-series.
+
+
 nixmass v1.3.0 (release date: 2025-05-08)
 =========================================
 
 Changes: 
 
 * The HS2SWE model was added.
-
 
 
 nixmass v1.2.5 (release date: 2024-12-18)
