@@ -10,10 +10,10 @@ swe.st10(
 )
 }
 \arguments{
-\item{data}{A data.frame with at least two columns named \code{date} and \code{hs}. 
-They should contain date and corresponding daily observations of snow depth \eqn{hs \ge 0} 
+\item{data}{A data.frame with at least two columns named \code{date} and \code{hs}.
+They should contain date and corresponding daily observations of snow depth \eqn{hs \ge 0}
 measured at one site. The unit must be meters (m). No gaps or NA are allowed.
-Dates must be either of class `character`, `Date` or `POSIXct` and given in the format 
+Dates must be either of class `character`, `Date` or `POSIXct` and given in the format
 \code{YYYY-MM-DD}. No sub-daily resolution is allowed at the moment (see details).}
 
 \item{snowclass.st10}{Must be one of the following character strings: "alpine","maritime","prairie","tundra","taiga".}
@@ -22,10 +22,10 @@ Dates must be either of class `character`, `Date` or `POSIXct` and given in the 
 A vector with daily SWE values in mm.
 }
 \description{
-The \emph{Sturm} model parametrizes bulk snow density with day of the year and a \emph{snowclass.st10}. It was trained on historical snow depth - density - SWE data from the United States, Canada, and Switzerland.
+The \emph{Sturm} model parameterizes bulk snow density with day of the year and a \emph{snowclass.st10}. It was trained on historical snow depth - density - SWE data from the United States, Canada, and Switzerland.
 }
 \details{
-This model converts snow depth to SWE using snow depth, day of year and station location (from which a climate class of snow can be inferred. The day of year (DOY) is the day-number of in the season 1.10. - 30.6. The 1.10. refers to DOY = -92. The 1.2. would be DOY = 32, while 15.11. would be DOY = -47. The \emph{snowclass.st10} must be one out of the character strings "alpine","maritime","prairie","tundra" and "taiga". 
+This model converts snow depth to SWE using snow depth, day of year and station location (from which a climate class of snow can be inferred. The day of year (DOY) is the day-number of in the season 1.10. - 30.6. The 1.10. refers to DOY = -92. The 1.2. would be DOY = 32, while 15.11. would be DOY = -47. The \emph{snowclass.st10} must be one out of the character strings "alpine","maritime","prairie","tundra" and "taiga".
 For the Alps probably "alpine" would be the most appropriate climate classification.
 Non computable values are returned as NA.
 }
