@@ -21,7 +21,7 @@ the empirical regression models in [Guyennon et al. (2019)](https://doi.org/10.1
 ## Installation
 
 The easiest way to get nixmass is to install it from CRAN. 
-Note however that this version already lacks some new features and bug fixes.
+
 ```r 
 install.packages("nixmass")
 ```
