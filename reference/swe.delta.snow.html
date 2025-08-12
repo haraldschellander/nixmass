@@ -130,26 +130,32 @@ which have been found via an optimization procedure (Winkler et al., 2021).
 Be aware that also the other model coefficients do slightly change.</p>
 <p>The following model coefficients must be provided:</p>
 <p><code>dyn_rho_max=FALSE</code>:</p><ul><li><p><code>rho.max</code> Maximum density of an individual snow layer produced by
-the delta.snow model (kg/m3), \(rho.max &gt; 0\)</p></li>
+the delta.snow model (kg/m3), \(rho.max &gt; 0\). Default is rho.max=401.2588 kg/m3.</p></li>
 <li><p><code>rho.null</code> Fresh snow density for a newly created layer (kg/m3), \(rho.null &gt; 0\).
-Currently optimized for daily snow depth observations.</p></li>
-<li><p><code>c.ov</code> Overburden factor due to fresh snow (-), \(c.ov &gt; 0\)</p></li>
+Currently optimized for daily snow depth observations. Default is rho.null=81.19417 kg/m3.</p></li>
+<li><p><code>c.ov</code> Overburden factor due to fresh snow (-), \(c.ov &gt; 0\). Default is c.ov=0.0005104722.</p></li>
 <li><p><code>k.ov</code> Defines the impact of the individual layer density on the
-compaction due to overburden (-), \(k.ov \in [0,1]\).</p></li>
-<li><p><code>k</code> Exponent of the exponential-law compaction (m3/kg), \(k &gt; 0\).</p></li>
-<li><p><code>tau</code> Uncertainty bound (m), \(tau &gt; 0\).</p></li>
-<li><p><code>eta.null</code> Effective compactive viscosity of snow for "zero-density" (Pa s).</p></li>
+compaction due to overburden (-), \(k.ov \in [0,1]\). Default is k.ov=0.37856737.</p></li>
+<li><p><code>k</code> Exponent of the exponential-law compaction (m3/kg), \(k &gt; 0\). Default is k=0.02993175 m3/kg.</p></li>
+<li><p><code>tau</code> Uncertainty bound (m), \(tau &gt; 0\). Default is tau=0.02362476 m.</p></li>
+<li><p><code>eta.null</code> Effective compactive viscosity of snow for "zero-density" (Pa s). Default is eta.null=8523356 (Pa s).</p></li>
 <li><p><code>timestep</code> Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.
 No sub-daily values are allowed at the moment (see details).</p></li>
 </ul><p><code>dy_rho_max=TRUE</code>:</p>
 <p>Instead of a constant coefficient for <code>rho.max</code>, these four
-parameters describe the smooth S-curve approximated by the <code>atan</code> trigonometric function.</p><ul><li><p><code>sigma</code> Steepness or slope of <code>atan</code> at its midpoint <code>mu</code>, (-), \(sigma &gt; 0\).</p></li>
-<li><p><code>mu</code> Central midpoint in days, where the steepest transition occurs (days), \(mu &gt; 0\).</p></li>
-<li><p><code>rho_h</code> Upper density bound for a single layer and the whole snow pack (kg/m3), \(rho_h &gt; 0\).</p></li>
+parameters describe the smooth S-curve approximated by the <code>atan</code> trigonometric function.</p><ul><li><p><code>sigma</code> Steepness or slope of <code>atan</code> at its midpoint <code>mu</code>, (-), \(sigma &gt; 0\). Default is sigma=0.03.</p></li>
+<li><p><code>mu</code> Central midpoint in days, where the steepest transition occurs (days), \(mu &gt; 0\). Default mu=80 days.</p></li>
+<li><p><code>rho_h</code> Upper density bound for a single layer and the whole snow pack (kg/m3), \(rho_h &gt; 0\). Default is rho_h=600 kg/m3.</p></li>
 <li><p><code>rho_l</code> Lower density bound for a single layer and the whole snow pack, where the transition begins
-(kg/m3), \(rho_l &gt; 0\).</p></li>
-</ul><p>All other coefficients are needed as well. Be aware however that they are slightly different.</p>
-<p>The easiest way to call the original delta.swe model is <code>swe.delta.snow(hsdata, dyn_rho_max = FALSE)</code>.
+(kg/m3), \(rho_l &gt; 0\). Default is rho_l=380 kg/m3.</p></li>
+</ul><p>All other coefficients are needed as well. Be aware however that they are slightly different:</p><ul><li><p><code>c.ov</code> Overburden factor due to fresh snow (-), \(c.ov &gt; 0\). Default is c.ov=0.0005170964.</p></li>
+<li><p><code>k.ov</code> Defines the impact of the individual layer density on the
+compaction due to overburden (-), \(k.ov \in [0,1]\). Default is k.ov=0.3782312.</p></li>
+<li><p><code>k</code> Exponent of the exponential-law compaction (m3/kg), \(k &gt; 0\). Default is k=0.029297.</p></li>
+<li><p><code>tau</code> Uncertainty bound (m), \(tau &gt; 0\). Default is tau=0.02356521 m.</p></li>
+<li><p><code>eta.null</code> Effective compactive viscosity of snow for "zero-density" (Pa s). Default is eta.null=8543502 (Pa s).</p></li>
+<li><p><code>timestep</code> Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.</p></li>
+</ul><p>The easiest way to call the original delta.swe model is <code>swe.delta.snow(hsdata, dyn_rho_max = FALSE)</code>.
 Note that parameters intrinsic to the dynamic density model provided with the original model
 are silently ignored.</p>
 <p>In principal, the model is able to cope with a sub-daily temporal resolution,
@@ -198,7 +204,7 @@ Schroeder, M.et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACI
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
