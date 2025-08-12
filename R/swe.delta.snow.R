@@ -49,7 +49,7 @@ utils::globalVariables(c("hs"))
 #'  * \code{c.ov} Overburden factor due to fresh snow (-), \eqn{c.ov > 0}. Default is c.ov=0.0005104722.
 #'  * \code{k.ov} Defines the impact of the individual layer density on the
 #'  compaction due to overburden (-), \eqn{k.ov \in [0,1]}. Default is k.ov=0.37856737.
-#'  * \code{k} Exponent of the exponential-law compaction (m3/kg), \eqn{k > 0}. Default is k=0.02993175.
+#'  * \code{k} Exponent of the exponential-law compaction (m3/kg), \eqn{k > 0}. Default is k=0.02993175 m3/kg.
 #'  * \code{tau} Uncertainty bound (m), \eqn{tau > 0}. Default is tau=0.02362476 m.
 #'  * \code{eta.null} Effective compactive viscosity of snow for "zero-density" (Pa s). Default is eta.null=8523356 (Pa s).
 #'  * \code{timestep} Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.
@@ -60,7 +60,7 @@ utils::globalVariables(c("hs"))
 #' Instead of a constant coefficient for \code{rho.max}, these four
 #' parameters describe the smooth S-curve approximated by the `atan` trigonometric function.
 #' * \code{sigma} Steepness or slope of `atan` at its midpoint \code{mu}, (-), \eqn{sigma > 0}. Default is sigma=0.03.
-#' * \code{mu} Central midpoint in days, where the steepest transition occurs (days), \eqn{mu > 0}. Default mu=80.
+#' * \code{mu} Central midpoint in days, where the steepest transition occurs (days), \eqn{mu > 0}. Default mu=80 days.
 #' * \code{rho_h} Upper density bound for a single layer and the whole snow pack (kg/m3), \eqn{rho_h > 0}. Default is rho_h=600 kg/m3.
 #' * \code{rho_l} Lower density bound for a single layer and the whole snow pack, where the transition begins
 #' (kg/m3), \eqn{rho_l > 0}. Default is rho_l=380 kg/m3.
