@@ -43,15 +43,15 @@ utils::globalVariables(c("hs"))
 #'
 #' \code{dyn_rho_max=FALSE}:
 #'  * \code{rho.max} Maximum density of an individual snow layer produced by
-#'  the delta.snow model (kg/m3), \eqn{rho.max > 0}
+#'  the delta.snow model (kg/m3), \eqn{rho.max > 0}. Default is rho.max=401.2588 kg/m3.
 #'  * \code{rho.null} Fresh snow density for a newly created layer (kg/m3), \eqn{rho.null > 0}.
-#'  Currently optimized for daily snow depth observations.
-#'  * \code{c.ov} Overburden factor due to fresh snow (-), \eqn{c.ov > 0}
+#'  Currently optimized for daily snow depth observations. Default is rho.null=81.19417 kg/m3.
+#'  * \code{c.ov} Overburden factor due to fresh snow (-), \eqn{c.ov > 0}. Default is c.ov=0.0005104722.
 #'  * \code{k.ov} Defines the impact of the individual layer density on the
-#'  compaction due to overburden (-), \eqn{k.ov \in [0,1]}.
-#'  * \code{k} Exponent of the exponential-law compaction (m3/kg), \eqn{k > 0}.
-#'  * \code{tau} Uncertainty bound (m), \eqn{tau > 0}.
-#'  * \code{eta.null} Effective compactive viscosity of snow for "zero-density" (Pa s).
+#'  compaction due to overburden (-), \eqn{k.ov \in [0,1]}. Default is k.ov=0.37856737.
+#'  * \code{k} Exponent of the exponential-law compaction (m3/kg), \eqn{k > 0}. Default is k=0.02993175.
+#'  * \code{tau} Uncertainty bound (m), \eqn{tau > 0}. Default is tau=0.02362476 m.
+#'  * \code{eta.null} Effective compactive viscosity of snow for "zero-density" (Pa s). Default is eta.null=8523356 (Pa s).
 #'  * \code{timestep} Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.
 #' No sub-daily values are allowed at the moment (see details).
 #'
@@ -59,13 +59,20 @@ utils::globalVariables(c("hs"))
 #'
 #' Instead of a constant coefficient for \code{rho.max}, these four
 #' parameters describe the smooth S-curve approximated by the `atan` trigonometric function.
-#' * \code{sigma} Steepness or slope of `atan` at its midpoint \code{mu}, (-), \eqn{sigma > 0}.
-#' * \code{mu} Central midpoint in days, where the steepest transition occurs (days), \eqn{mu > 0}.
-#' * \code{rho_h} Upper density bound for a single layer and the whole snow pack (kg/m3), \eqn{rho_h > 0}.
+#' * \code{sigma} Steepness or slope of `atan` at its midpoint \code{mu}, (-), \eqn{sigma > 0}. Default is sigma=0.03.
+#' * \code{mu} Central midpoint in days, where the steepest transition occurs (days), \eqn{mu > 0}. Default mu=80.
+#' * \code{rho_h} Upper density bound for a single layer and the whole snow pack (kg/m3), \eqn{rho_h > 0}. Default is rho_h=600 kg/m3.
 #' * \code{rho_l} Lower density bound for a single layer and the whole snow pack, where the transition begins
-#' (kg/m3), \eqn{rho_l > 0}.
+#' (kg/m3), \eqn{rho_l > 0}. Default is rho_l=380 kg/m3.
 #'
-#' All other coefficients are needed as well. Be aware however that they are slightly different.
+#' All other coefficients are needed as well. Be aware however that they are slightly different:
+#'  * \code{c.ov} Overburden factor due to fresh snow (-), \eqn{c.ov > 0}. Default is c.ov=0.0005170964.
+#'  * \code{k.ov} Defines the impact of the individual layer density on the
+#'  compaction due to overburden (-), \eqn{k.ov \in [0,1]}. Default is k.ov=0.3782312.
+#'  * \code{k} Exponent of the exponential-law compaction (m3/kg), \eqn{k > 0}. Default is k=0.029297.
+#'  * \code{tau} Uncertainty bound (m), \eqn{tau > 0}. Default is tau=0.02356521 m.
+#'  * \code{eta.null} Effective compactive viscosity of snow for "zero-density" (Pa s). Default is eta.null=8543502 (Pa s).
+#'  * \code{timestep} Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.
 #'
 #' The easiest way to call the original delta.swe model is \code{swe.delta.snow(hsdata, dyn_rho_max = FALSE)}.
 #' Note that parameters intrinsic to the dynamic density model provided with the original model
@@ -146,10 +153,13 @@ swe.delta.snow <- function(
   #---------------------------------------------------------------------
   # general checks
 
-  if (!inherits(data, "data.frame")) stop("data must be of class 'data.frame'")
+  if (!inherits(data, "data.frame")) {
+    stop("data must be of class 'data.frame'")
+  }
 
-  if (!all((is.element(colnames(data), c("hs", "date")))))
+  if (!all((is.element(colnames(data), c("hs", "date"))))) {
     stop("data must contain at least two columns named 'date' and 'hs'")
+  }
 
   if (inherits(data$date, "character")) {
     if (any(is.na(as.POSIXlt(data$date, format = "%Y-%m-%d")))) {
@@ -158,17 +168,24 @@ swe.delta.snow <- function(
       data$date <- as.Date(data$date)
     }
   } else if (inherits(data$date, "Date") | inherits(data$date, "POSIXct")) {
-    if (any(is.na(as.POSIXlt(data$date, format = "%Y-%m-%d"))))
+    if (any(is.na(as.POSIXlt(data$date, format = "%Y-%m-%d")))) {
       stop("date format must be '%Y-%m-%d'")
+    }
   } else {
     stop("date column must be either of class 'character', 'Date' or 'POSIXct'")
   }
 
-  if (length(which(data$hs < 0)) > 0) stop("data must not contain values < 0")
+  if (length(which(data$hs < 0)) > 0) {
+    stop("data must not contain values < 0")
+  }
 
-  if (any(is.na(data$hs))) stop("data must not contain NA")
+  if (any(is.na(data$hs))) {
+    stop("data must not contain NA")
+  }
 
-  if (!is.numeric(data$hs)) stop("snow depth data must be numeric")
+  if (!is.numeric(data$hs)) {
+    stop("snow depth data must be numeric")
+  }
 
   # first_hs <- data |>
   #   dplyr::arrange(as.Date(date)) |>
@@ -177,11 +194,14 @@ swe.delta.snow <- function(
 
   if (strict_mode) {
     first_hs <- data$hs[which.min(as.Date(data$date))]
-    if (first_hs != 0) stop("snow depth observations must start with 0")
+    if (first_hs != 0) {
+      stop("snow depth observations must start with 0")
+    }
 
     z <- zoo(data$hs, as.Date(data$date))
-    if (!is.regular(z, strict = TRUE))
+    if (!is.regular(z, strict = TRUE)) {
       stop("snow depth data must be strictly regular")
+    }
   } else {
     # add a zero value on top
     first_date <- data$date[which.min(as.Date(data$date))]
@@ -192,28 +212,49 @@ swe.delta.snow <- function(
   # parameter checks
 
   if (dyn_rho_max) {
-    if (model_opts$sigma <= 0) stop("'sigma' must not be negative or 0")
-    if (model_opts$mu <= 0) stop("'mu' must not be negative or 0")
-    if (model_opts$rho_h <= 0) stop("'rho_h' must not be negative or 0")
+    if (model_opts$sigma <= 0) {
+      stop("'sigma' must not be negative or 0")
+    }
+    if (model_opts$mu <= 0) {
+      stop("'mu' must not be negative or 0")
+    }
+    if (model_opts$rho_h <= 0) {
+      stop("'rho_h' must not be negative or 0")
+    }
     if (model_opts$rho_l <= 0) stop("'rho_l' must not be negative or 0")
   } else {
     if (model_opts$rho.max <= 0) stop("'rho.max' must not be negative or 0")
   }
 
-  if (model_opts$rho.null <= 0) stop("'rho.null' must not be negative or 0")
-  if (model_opts$c.ov <= 0) stop("'c.ov' must not be negative or 0")
-  if (model_opts$k.ov < 0) stop("'k.ov' must be > 0")
-  if (model_opts$k.ov > 1) stop("'k.ov' must be < 1")
-  if (model_opts$k <= 0) stop("'k' must not be negative or 0")
-  if (model_opts$tau <= 0) stop("'tau' must not be negative or 0")
+  if (model_opts$rho.null <= 0) {
+    stop("'rho.null' must not be negative or 0")
+  }
+  if (model_opts$c.ov <= 0) {
+    stop("'c.ov' must not be negative or 0")
+  }
+  if (model_opts$k.ov < 0) {
+    stop("'k.ov' must be > 0")
+  }
+  if (model_opts$k.ov > 1) {
+    stop("'k.ov' must be < 1")
+  }
+  if (model_opts$k <= 0) {
+    stop("'k' must not be negative or 0")
+  }
+  if (model_opts$tau <= 0) {
+    stop("'tau' must not be negative or 0")
+  }
 
   # check timestep vs data
-  if (model_opts$timestep < 24) stop("timestep must be >= 24 hours")
+  if (model_opts$timestep < 24) {
+    stop("timestep must be >= 24 hours")
+  }
   d_secs <- abs(
     as.numeric(as.POSIXct(data$date[2])) - as.numeric(as.POSIXct(data$date[1]))
   )
-  if (d_secs / 60 / 60 != model_opts$timestep)
+  if (d_secs / 60 / 60 != model_opts$timestep) {
     stop("provided timestep does not fit your data")
+  }
 
   nixmass.e <- new.env()
   nixmass.e$snowpack.dd <- NULL
@@ -321,7 +362,9 @@ swe.delta.snow <- function(
     # .d  -> today
     # .dd -> tomorrow
     age.d <- ifelse(x[1] == 0, 0, x[4])
-    if (dyn_rho_max) rho.max <- rho_max_dyn(age.d)
+    if (dyn_rho_max) {
+      rho.max <- rho_max_dyn(age.d)
+    }
     h.dd <- x[1] / (1 + (x[3] * g * ts) / eta.null * exp(-k * x[2] / x[1]))
     h.dd <- ifelse(x[2] / h.dd > rho.max, x[2] / rho.max, h.dd)
     h.dd <- ifelse(x[1] == 0, 0, h.dd)
@@ -366,7 +409,9 @@ swe.delta.snow <- function(
     prec,
     m
   ) {
-    if (verbose) msg(m, t, paste("melt "))
+    if (verbose) {
+      msg(m, t, paste("melt "))
+    }
 
     Hobs.d = Hobs[t]
     h.d = h[, 2]
@@ -377,7 +422,9 @@ swe.delta.snow <- function(
 
     # distribute mass top-down
     for (i in ly:1) {
-      if (dyn_rho_max) rho.max <- rho_max_dyn(age.d[i])
+      if (dyn_rho_max) {
+        rho.max <- rho_max_dyn(age.d[i])
+      }
       if (sum(h.d[-i]) + swe.d[i] / rho.max - Hobs.d >= prec) {
         # layers is densified to rho.max
         h.d[i] <- swe.d[i] / rho.max
@@ -392,12 +439,18 @@ swe.delta.snow <- function(
     }
 
     # all layers have rho.max
-    if (dyn_rho_max) rho.max <- rho_max_dyn(age.d[1:ly])
+    if (dyn_rho_max) {
+      rho.max <- rho_max_dyn(age.d[1:ly])
+    }
     if (all(rho.max - swe.d[1:ly] / h.d[1:ly] <= prec)) {
-      if (verbose) msg(m, t, paste("no further compaction "))
+      if (verbose) {
+        msg(m, t, paste("no further compaction "))
+      }
 
       # produce runoff if sum(h.d) - Hobs.d is still > 0
-      if (verbose) msg(m, t, paste("runoff "))
+      if (verbose) {
+        msg(m, t, paste("runoff "))
+      }
       scale <- Hobs.d / sum(h.d)
       if (dyn_rho_max) {
         swe_total.d <- c()
@@ -481,7 +534,9 @@ swe.delta.snow <- function(
     h.d <- h[, 1]
     swe.d <- swe[, 1]
     age.d <- age[, 2]
-    if (dyn_rho_max) rho.max <- rho_max_dyn(age.d)
+    if (dyn_rho_max) {
+      rho.max <- rho_max_dyn(age.d)
+    }
 
     # todays overburden
     swe.hat.d <- numeric(length = length(ly.tot))
@@ -508,13 +563,16 @@ swe.delta.snow <- function(
     H.dd.cor <- sum(h.dd.cor)
 
     # and check, if Hd.cor is the same as Hobs.d
-    if (abs(H.dd.cor - Hobs.dd) > prec)
+    if (abs(H.dd.cor - Hobs.dd) > prec) {
       warning(paste0(
         "day ",
         t,
-        ": error in exponential re-compaction: H.dd.cor-Hobs.dd=",
-        H.dd.cor - Hobs.dd
+        ": problem in exponential re-compaction: H.dd.cor - Hobs.dd = ",
+        H.dd.cor - Hobs.dd,
+        "\nShould be <= ",
+        prec
       ))
+    }
 
     # which layers exceed rho.max?
     idx.max <- which(swe.d / h.dd.cor - rho.max > prec)
@@ -550,7 +608,9 @@ swe.delta.snow <- function(
           swe.excess.all <- swe.excess.all - swe.res
           i <- i - 1
           if (i <= 0 & swe.excess.all > 0) {
-            if (verbose) msg(m, t, paste(" runoff"))
+            if (verbose) {
+              msg(m, t, paste(" runoff"))
+            }
             break
           }
         }
@@ -620,7 +680,9 @@ swe.delta.snow <- function(
   }
 
   for (t in 1:day.tot) {
-    if (verbose) msg(m, t, paste0("day ", t, " (", data$date[t], "): "))
+    if (verbose) {
+      msg(m, t, paste0("day ", t, " (", data$date[t], "): "))
+    }
 
     # shift temporary matrices one step back in time
     h[, 1] <- h[, 2]
@@ -637,14 +699,20 @@ swe.delta.snow <- function(
     if (Hobs[t] == 0) {
       if (t > 1) {
         if (Hobs[t - 1] == 0) {
-          if (verbose) msg(m, t, paste0(""))
+          if (verbose) {
+            msg(m, t, paste0(""))
+          }
           if (layers) proc[[t]] <- NA
         } else {
-          if (verbose) msg(m, t, paste0("runoff"))
+          if (verbose) {
+            msg(m, t, paste0("runoff"))
+          }
           if (layers) proc[[t]] <- "runoff"
         }
       } else {
-        if (verbose) msg(m, t, paste0(""))
+        if (verbose) {
+          msg(m, t, paste0(""))
+        }
         if (layers) proc[[t]] <- NA
       }
       H[t] <- 0
@@ -663,8 +731,12 @@ swe.delta.snow <- function(
       # first snow of snowfall event(s)
       if (Hobs[t - 1] == 0) {
         ly <- 1
-        if (verbose) msg(m, t, paste("produce layer", ly))
-        if (layers) proc[[t]] <- paste("produce layer", ly)
+        if (verbose) {
+          msg(m, t, paste("produce layer", ly))
+        }
+        if (layers) {
+          proc[[t]] <- paste("produce layer", ly)
+        }
         age[ly, 2] <- 1
         h[ly, 2] <- Hobs[t]
         H[t] <- Hobs[t]
@@ -711,8 +783,12 @@ swe.delta.snow <- function(
         }
 
         if (deltaH > model_opts$tau) {
-          if (verbose) msg(m, t, paste("create new layer", ly + 1))
-          if (layers) proc[[t]] <- paste("create new layer", ly + 1)
+          if (verbose) {
+            msg(m, t, paste("create new layer", ly + 1))
+          }
+          if (layers) {
+            proc[[t]] <- paste("create new layer", ly + 1)
+          }
           sigma.null <- deltaH * model_opts$rho.null * g
           if (dyn_rho_max) {
             epsilon <- model_opts$c.ov *
@@ -782,8 +858,12 @@ swe.delta.snow <- function(
 
           # no mass gain or loss, but scaling
         } else if (deltaH >= -model_opts$tau & deltaH <= model_opts$tau) {
-          if (verbose) msg(m, t, paste("scaling: "))
-          if (layers) proc[[t]] <- paste("create new layer", ly + 1)
+          if (verbose) {
+            msg(m, t, paste("scaling: "))
+          }
+          if (layers) {
+            proc[[t]] <- paste("create new layer", ly + 1)
+          }
           ly.tot <- nrow(h)
           rl <- scaleH(
             t,
@@ -815,8 +895,12 @@ swe.delta.snow <- function(
             age_layers[[t]] <- age[, 2]
           }
         } else if (deltaH < -model_opts$tau) {
-          if (verbose) msg(m, t, paste("drenching: "))
-          if (layers) proc[[t]] <- paste("drenching: ")
+          if (verbose) {
+            msg(m, t, paste("drenching: "))
+          }
+          if (layers) {
+            proc[[t]] <- paste("drenching: ")
+          }
           ly.tot <- nrow(h)
           rl <- drenchH(
             t,
@@ -849,7 +933,9 @@ swe.delta.snow <- function(
             age_layers[[t]] <- age[, 2]
           }
         } else {
-          if (verbose) msg(m, t, "?")
+          if (verbose) {
+            msg(m, t, "?")
+          }
           if (layers) proc[[t]] <- "?"
         }
       }
