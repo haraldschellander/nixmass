@@ -1,16 +1,25 @@
+nixmass v1.3.2 (release date: 2026-09-28)
+=========================================
+
+Changes:
+
+* Updated standard model parameters for the dynamical rho_max version
+of delta.snow using the new calibration scheme developed by Jakob Werkgarner (PR #12).
+
+
 nixmass v1.3.1 (release date: 2025-05-09)
 =========================================
 
-Changes: 
+Changes:
 
-* Included the `strict_mode` argument in the delta.snow models which does not perform 
+* Included the `strict_mode` argument in the delta.snow models which does not perform
 strict date checking and allows for zero snow depth values at the beginnig of the time-series.
 
 
 nixmass v1.3.0 (release date: 2025-05-08)
 =========================================
 
-Changes: 
+Changes:
 
 * The HS2SWE model was added.
 
@@ -18,17 +27,17 @@ Changes:
 nixmass v1.2.5 (release date: 2024-12-18)
 =========================================
 
-Changes: 
+Changes:
 
 * The plot function can now return a density plot on demand.
-* Fixed a bug where the number of layers at the end of the winter season determined 
+* Fixed a bug where the number of layers at the end of the winter season determined
 the returned layer matrices.
 
 
 nixmass v1.2.4 (release date: 2024-12-14)
 =========================================
 
-Changes: 
+Changes:
 
 * Fixed a bug which led to computational issues, i.e. warnigs about wrong index lengths.
 * Added stop clause, when the input snow depth was probably not converted to meters.
@@ -37,15 +46,15 @@ Changes:
 nixmass v1.2.3 (release date: 2024-12-04)
 =========================================
 
-Changes: 
+Changes:
 
 * The internal matrices of snow depth (h), swe and age are returned on demand.
 
 
 nixmass v1.1.3 (release date: 2024-10-23)
 =========================================
-     
-Changes: 
+
+Changes:
 
 * The maximum bulk snow density increases smoothly with age following a trigonometric `atan` activation function.
 * The swe.delta.snow function is backwards compatible with the original delta.snow formulation.
@@ -53,8 +62,8 @@ Changes:
 
 nixmass v1.0.3 (release date: 2024-06-11)
 =========================================
-     
-Changes: 
+
+Changes:
 
 * Date columns in data objects can now be either of class `character`, `Date` or `POSIXct`.
 * Switched to Roxygen for package management.
@@ -63,9 +72,8 @@ Changes:
 
 nixmass v1.0.2 (released ate: 2021-03-05)
 =========================================
-     
-Changes: 
+
+Changes:
 
 * Large preallocated matrices for keeping track of the main variables have been replaced by small matrices. They comprise of only three timesteps, i.e. timestep - 1, timestep, and timestep + 1. This makes computation much faster, and there is no more restriction of the data series length.
 * The summary function has now a prettier output.
-

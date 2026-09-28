@@ -1,11 +1,12 @@
 Package: nixmass
 Title: Snow Water Equivalent Modeling with the 'Delta.snow' and 'HS2SWE'
     Models and Empirical Regression Models
-Version: 1.3.1
-Date: 2025-05-09
+Version: 1.3.2
+Date: 2026-09-28
 Authors@R: c(
-    person("Harald", "Schellander", , "harald.schellander@geosphere.at", role = c("aut", "cre", "cph")),
-    person("Michael", "Winkler", role = c("ctb", "cph"))
+    person("Harald", "Schellander", email = "harald.schellander@geosphere.at", role = c("aut", "cre", "cph")),
+    person("Michael", "Winkler", email = "michael.winkler@geosphere.at", role = c("ctb", "cph")),
+    person("Jakob", "Werkgarner", email = "Jakob.Werkgarner@student.uibk.ac.at", role = c("ctb"))
   )
 Maintainer: Harald Schellander <harald.schellander@geosphere.at>
 Description: Snow water equivalent is modeled with the process based
@@ -20,20 +21,20 @@ Description: Snow water equivalent is modeled with the process based
     <doi:10.1175/2010JHM1202.1>.
 License: GPL-3
 URL: https://haraldschellander.github.io/nixmass/
-Depends: 
+Depends:
     ggplot2,
     graphics,
     grDevices,
     R (>= 3.5.0),
     stats
-Imports: 
+Imports:
     colorspace,
     dplyr,
     lubridate,
     tidyr,
     utils,
     zoo
-Suggests: 
+Suggests:
     spelling,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
