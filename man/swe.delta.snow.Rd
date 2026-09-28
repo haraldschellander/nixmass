@@ -80,26 +80,26 @@ compaction due to overburden (-), \eqn{k.ov \in [0,1]}. Default is k.ov=0.378567
 No sub-daily values are allowed at the moment (see details).
 }
 
-\code{dy_rho_max=TRUE}:
+\code{dyn_rho_max=TRUE}:
 
 Instead of a constant coefficient for \code{rho.max}, these four
 parameters describe the smooth S-curve approximated by the \code{atan} trigonometric function.
 \itemize{
-\item \code{sigma} Steepness or slope of \code{atan} at its midpoint \code{mu}, (-), \eqn{sigma > 0}. Default is sigma=0.03.
-\item \code{mu} Central midpoint in days, where the steepest transition occurs (days), \eqn{mu > 0}. Default mu=80 days.
-\item \code{rho_h} Upper density bound for a single layer and the whole snow pack (kg/m3), \eqn{rho_h > 0}. Default is rho_h=600 kg/m3.
+\item \code{sigma} Steepness or slope of \code{atan} at its midpoint \code{mu}, (-), \eqn{sigma > 0}. Default is sigma=0.0332.
+\item \code{mu} Central midpoint in days, where the steepest transition occurs (days), \eqn{mu > 0}. Default mu=86.2 days.
+\item \code{rho_h} Upper density bound for a single layer and the whole snow pack (kg/m3), \eqn{rho_h > 0}. Default is rho_h=688 kg/m3.
 \item \code{rho_l} Lower density bound for a single layer and the whole snow pack, where the transition begins
-(kg/m3), \eqn{rho_l > 0}. Default is rho_l=380 kg/m3.
+(kg/m3), \eqn{rho_l > 0}. Default is rho_l=265 kg/m3.
 }
 
 All other coefficients are needed as well. Be aware however that they are slightly different:
 \itemize{
-\item \code{c.ov} Overburden factor due to fresh snow (-), \eqn{c.ov > 0}. Default is c.ov=0.0005170964.
+\item \code{c.ov} Overburden factor due to fresh snow (-), \eqn{c.ov > 0}. Default is c.ov=0.000585.
 \item \code{k.ov} Defines the impact of the individual layer density on the
-compaction due to overburden (-), \eqn{k.ov \in [0,1]}. Default is k.ov=0.3782312.
-\item \code{k} Exponent of the exponential-law compaction (m3/kg), \eqn{k > 0}. Default is k=0.029297.
-\item \code{tau} Uncertainty bound (m), \eqn{tau > 0}. Default is tau=0.02356521 m.
-\item \code{eta.null} Effective compactive viscosity of snow for "zero-density" (Pa s). Default is eta.null=8543502 (Pa s).
+compaction due to overburden (-), \eqn{k.ov \in [0,1]}. Default is k.ov=0.398.
+\item \code{k} Exponent of the exponential-law compaction (m3/kg), \eqn{k > 0}. Default is k=0.0285.
+\item \code{tau} Uncertainty bound (m), \eqn{tau > 0}. Default is tau=0.0201 m.
+\item \code{eta.null} Effective compactive viscosity of snow for "zero-density" (Pa s). Default is eta.null=8900212 (Pa s).
 \item \code{timestep} Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.
 }
 
@@ -129,11 +129,13 @@ Gruber, S. (2014) "Modelling snow water equivalent based on daily snow depths", 
 \cr\cr
 Martinec, J., Rango, A. (1991) "Indirect evaluation of snow reserves in mountain basins". Snow, Hydrology and Forests in High Alpine Areas. pp. 111-120.
 \cr\cr
+Schroeder, M.et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
+\cr\cr
 Sturm, M., Holmgren, J. (1998) "Differences in compaction behavior of three climate classes of snow". Annals of Glaciology 26, 125-130.
 \cr\cr
-Winkler, M., Schellander, H., and Gruber, S.: Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021, 2021.
+Werkgarner, J. (2026): Improving the delta.snow model, Master's Thesis, University of Innsbruck.
 \cr\cr
-Schroeder, M.et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
+Winkler, M., Schellander, H., and Gruber, S. (2021): Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021.
 }
 \author{
 Harald Schellander, Michael Winkler
