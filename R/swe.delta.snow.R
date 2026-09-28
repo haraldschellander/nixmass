@@ -36,8 +36,11 @@ utils::globalVariables(c("hs"))
 #' `atan` is used, where the S-curve symmetrically transitions from the lower to the upper density bound.
 #' In that case, \code{model_opts} are extended by a lower density bound \code{rho_l},
 #' an upper density bound \code{rho_h}, a slope \code{sigma} and a midpoint \code{mu},
-#' which have been found via an optimization procedure (Winkler et al., 2021).
-#' Be aware that also the other model coefficients do slightly change.
+#' which together with the other parameters have been found via the improved optimization procedure of Werkgarner (2026).
+#' Altering one or more of the model parameters can be done with the option \code{model_opts},
+#' which must provide a named list with the altered parameters. Be aware that altering only one parameter
+#' may have neagtive effects on model accuracy, as during an optimisation procedure, all parameters are balanced to yield
+#' a minimum loss.
 #'
 #' The following model coefficients must be provided:
 #'
@@ -65,7 +68,7 @@ utils::globalVariables(c("hs"))
 #' * \code{rho_l} Lower density bound for a single layer and the whole snow pack, where the transition begins
 #' (kg/m3), \eqn{rho_l > 0}. Default is rho_l=265 kg/m3.
 #'
-#' All other coefficients are needed as well. Be aware however that they are slightly different:
+#' All other coefficients are needed as well. Note that they are slightly different to the constant rho_max version:
 #'  * \code{c.ov} Overburden factor due to fresh snow (-), \eqn{c.ov > 0}. Default is c.ov=0.000585.
 #'  * \code{k.ov} Defines the impact of the individual layer density on the
 #'  compaction due to overburden (-), \eqn{k.ov \in [0,1]}. Default is k.ov=0.398.
