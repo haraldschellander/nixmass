@@ -26,7 +26,7 @@ specific to the original delta.snow model (Winkler et al., 2021) or a version, w
 the maximum layer and bulk snow densities are allowed to vary with age (see details).}
 
 \item{dyn_rho_max}{Logical. If \code{TRUE}, the maximum bulk snow density is allowed to vary with layer age (see details).
-if \code{FALSE}, the original delta.snow model is used.}
+If \code{FALSE}, the original delta.snow model is used.}
 
 \item{layers}{Should parameters snow depth, swe and age be returned layerwise? Can be \code{TRUE} or \code{FALSE}.}
 
@@ -37,7 +37,7 @@ if the snow depth series starts with zero.}
 }
 \value{
 If \code{layers=FALSE}, a vector with daily SWE values in mm. If \code{layers=TRUE}, a list with layerwise matrices
-of the parameters h (snow depth), swe and age is returned additionally to the SWE vector. The matrix rows correspond to \code{layers},
+of the parameters h (snow depth), swe and age is returned in addition to the SWE vector. The matrix rows correspond to \code{layers},
 columns correspond to \code{dates}. swe is in mm, h in m and age in days.
 }
 \description{
@@ -60,9 +60,13 @@ If \code{dyn_rho_max=TRUE}, the bulk snow density varies with layer age. As acti
 In that case, \code{model_opts} are extended by a lower density bound \code{rho_l},
 an upper density bound \code{rho_h}, a slope \code{sigma} and a midpoint \code{mu},
 which together with the other parameters have been found via the improved optimization procedure of Werkgarner (2026).
+There, all ten parameters were optimized simultaneously (Nelder-Mead) against daily SWE simulated by SNOWPACK
+at eight alpine stations, using the Kling-Gupta efficiency of SWE as objective.
+Among several calibration datasets and objective functions, this set performed best in an independent validation
+against SWE and new-snow water equivalent observations.
 Altering one or more of the model parameters can be done with the option \code{model_opts},
 which must provide a named list with the altered parameters. Be aware that altering only one parameter
-may have neagtive effects on model accuracy, as during an optimisation procedure, all parameters are balanced to yield
+may have negative effects on model accuracy, as during an optimization procedure, all parameters are balanced to yield
 a minimum loss.
 
 The following model coefficients must be provided:
@@ -95,8 +99,9 @@ parameters describe the smooth S-curve approximated by the \code{atan} trigonome
 (kg/m3), \eqn{rho_l > 0}. Default is rho_l=265 kg/m3.
 }
 
-All other coefficients are needed as well. Note that they are slightly different to the constant rho_max version:
+All other coefficients are needed as well. Note that they differ from the constant rho_max version:
 \itemize{
+\item \code{rho.null} Fresh snow density for a newly created layer (kg/m3), \eqn{rho.null > 0}. Default is rho.null=107 kg/m3.
 \item \code{c.ov} Overburden factor due to fresh snow (-), \eqn{c.ov > 0}. Default is c.ov=0.000585.
 \item \code{k.ov} Defines the impact of the individual layer density on the
 compaction due to overburden (-), \eqn{k.ov \in [0,1]}. Default is k.ov=0.398.
@@ -106,11 +111,11 @@ compaction due to overburden (-), \eqn{k.ov \in [0,1]}. Default is k.ov=0.398.
 \item \code{timestep} Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.
 }
 
-The easiest way to call the original delta.swe model is \code{swe.delta.snow(hsdata, dyn_rho_max = FALSE)}.
+The easiest way to call the original delta.snow model is \code{swe.delta.snow(hsdata, dyn_rho_max = FALSE)}.
 Note that parameters intrinsic to the dynamic density model provided with the original model
 are silently ignored.
 
-In principal, the model is able to cope with a sub-daily temporal resolution,
+In principle, the model is able to cope with a sub-daily temporal resolution,
 e.g. hourly snow depth observations. However, the model was fitted to daily observations,
 and the model parameter \code{rho.null} reflects that. In other words, if the observation frequency changes,
 \code{rho.null} should change as well. Currently, no sub-daily resolution is allowed.
@@ -128,11 +133,11 @@ legend(title = "delta.snow", "topleft", legend = c("SWE dyn", "SWE", "HS"),
 
 }
 \references{
-Gruber, S. (2014) "Modelling snow water equivalent based on daily snow depths", Masterthesis, Institute for Atmospheric and Cryospheric Sciences, University of Innsbruck.
+Gruber, S. (2014) "Modelling snow water equivalent based on daily snow depths", Master's Thesis, Institute for Atmospheric and Cryospheric Sciences, University of Innsbruck.
 \cr\cr
 Martinec, J., Rango, A. (1991) "Indirect evaluation of snow reserves in mountain basins". Snow, Hydrology and Forests in High Alpine Areas. pp. 111-120.
 \cr\cr
-Schroeder, M.et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
+Schroeder, M. et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
 \cr\cr
 Sturm, M., Holmgren, J. (1998) "Differences in compaction behavior of three climate classes of snow". Annals of Glaciology 26, 125-130.
 \cr\cr
