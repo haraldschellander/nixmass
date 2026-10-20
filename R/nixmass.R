@@ -63,9 +63,10 @@ NULL
 #'
 #' @details This function is a wrapper for the simulation of SWE with different models.
 #' The process based model \code{\link[=swe.delta.snow]{delta.snow}}
-#' can be chosen in its original formulation (Winkler et al. 20219) and with a dynamically
-#' increasing maximum bulk snow density (Schroeder et al., 2024). The \code{\link[=hs2swe]{hs2swe}}
+#' can be chosen in its original formulation (Winkler et al., 20219) and with a dynamically
+#' increasing maximum bulk snow density (Schroeder et al., 2024; Werkgarner, 2026). The \code{\link[=hs2swe]{hs2swe}}
 #' model is an alternative formulation of the same physical concept used in delta.snow (Magnusson, et al., 2025).
+#' For an exhausting discussion on differences between the delta.snow and HS2SWE models see Werkgarner (2026).
 #' Some empirical regression models can also be chosen:
 #' \code{\link[=swe.jo09]{Jonas},\link[=swe.pi16]{Pistocchi}, \link[=swe.st10]{Sturm}} and \link[=swe.gu19]{Guyennon}.
 #' For the `delta.snow` and `hs2swe` models and the ones of `Pistocchi` and `Guyennon`,
@@ -112,6 +113,8 @@ NULL
 #' Pistocchi, A. (2016) "Simple estimation of snow density in an Alpine region", Journal of Hydrology: Regional Studies. Elsevier B.V., 6(Supplement C), pp. 82 - 89. doi: 10.1016/j.ejrh.2016.03.004.
 #' \cr\cr
 #' Sturm, M. et al. (2010) "Estimating Snow Water Equivalent Using Snow Depth Data and Climate Classes", Journal of Hydrometeorology, 11(6), pp. 1380 - 1394. doi: 10.1175/2010JHM1202.1.
+#' \cr\cr
+#' Werkgarner, J. (2026): Improving the delta.snow model, Master's Thesis, University of Innsbruck.
 #' \cr\cr
 #' Winkler, M., Schellander, H., and Gruber, S.: Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021, 2021.
 #' \cr\cr
@@ -166,7 +169,9 @@ nixmass <- function(
   # }
 
   if (any(grepl("jo09", model))) {
-    if (missing(alt)) stop("Argument 'alt' is missing")
+    if (missing(alt)) {
+      stop("Argument 'alt' is missing")
+    }
     if (missing(region.jo09)) stop("Argument 'region.jo09' is missing")
   }
 
@@ -246,12 +251,14 @@ nixmass <- function(
 #' summary(n)
 #'
 summary.nixmass <- function(object, ...) {
-  if (!inherits(object, "nixmass"))
+  if (!inherits(object, "nixmass")) {
     stop("nixmass: Object must be of class 'nixmass'.")
+  }
 
   models <- names(object$swe)
-  if (length(models) == 0)
+  if (length(models) == 0) {
     stop("nixmass: Cannot print anything. No model was computed.")
+  }
 
   l <- lapply(object$swe, quantile, na.rm = T)
   lm <- lapply(object$swe, mean, na.rm = T)
@@ -285,11 +292,14 @@ summary.nixmass <- function(object, ...) {
 #' plot(nixmass(hsdata, model = "delta.snow.dyn_rho_max", layers = TRUE), density = TRUE)
 #'
 plot.nixmass <- function(x, title = NULL, density = FALSE, ...) {
-  if (!inherits(x, "nixmass"))
+  if (!inherits(x, "nixmass")) {
     stop("nixmass: Object must be of class 'nixmass'.")
+  }
 
   models <- names(x$swe)
-  if (length(models) == 0) stop("nixmass: Cannot plot. No model was computed.")
+  if (length(models) == 0) {
+    stop("nixmass: Cannot plot. No model was computed.")
+  }
 
   if (density) {
     if (length(models) > 1) {
