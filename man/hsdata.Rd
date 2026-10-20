@@ -17,7 +17,7 @@ in meters and is of class \code{numeric}.}
 data(hsdata)
 }
 \description{
-Gapless daily snow depth observations for a winter season from 1.8. - 31.7. from a station situated in the northern earstern alps at an altitude of 600 m. For anonymization the years are intentionally set to 1900 - 1901.
+Gapless daily snow depth observations for a winter season from 1.8. - 31.7. from a station situated in the northern Eastern Alps at an altitude of 600 m. For anonymization the years are intentionally set to 1900 - 1901.
 This data series is free of gaps with a minimum of 0 and a maximum of 1.3 meters.
 It is intended to be used as is as input data for the package \code{\link{nixmass}}
 to calculate snow water equivalent and bulk snow density with the delta.snow method

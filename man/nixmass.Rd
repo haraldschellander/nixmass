@@ -28,19 +28,19 @@ Dates must be either of class `character`, `Date` or `POSIXct` and given in the 
 `delta.snow.dyn_rho_max`, `hs2swe`, `jo09`, `pi16`, `st10`, `gu19`. If no model is given,
 `delta.snow` will be taken.}
 
-\item{alt}{Must be given in meter if one of model is `jo09`. Ignored otherwise.}
+\item{alt}{Must be given in meters if one of model is `jo09`. Ignored otherwise.}
 
 \item{region.jo09}{Must be given if one of model is `jo09`, ignored otherwise. This must be an integer number
 between 1 and 7 of the Swiss region where the station belongs to, according to Fig. 1 in the original reference.}
 
 \item{region.gu19}{If model contains `gu19` this must be one of `italy`, `southwest`, `central` or `southeast` as described in the original reference.
-#' Ignored if model is not `gu19`.}
+Ignored if model is not `gu19`.}
 
 \item{snowclass.st10}{Must be given if one of model is `st10`. Must be one of the following character strings:
 `alpine`, `maritime`, `prairie`, `tundra`, `taiga` as outlined in the original reference.
 Ignored if model is not `st10`.}
 
-\item{layers}{Logical. Should parameters snow depth, swe and age be returned layerwise?.}
+\item{layers}{Logical. Should parameters snow depth, swe and age be returned layerwise?}
 
 \item{strict_mode}{Logical. If `TRUE`, the function checks if the data is strictly regular and
 if the snow depth series starts with zero.}
@@ -61,9 +61,10 @@ snow depth, elevation, date and climate class.
 \details{
 This function is a wrapper for the simulation of SWE with different models.
 The process based model \code{\link[=swe.delta.snow]{delta.snow}}
-can be chosen in its original formulation (Winkler et al. 20219) and with a dynamically
-increasing maximum bulk snow density (Schroeder et al., 2024). The \code{\link[=hs2swe]{hs2swe}}
-model is an alternative formulation of the same physical concept used in delta.snow (Magnusson, et al., 2025).
+can be chosen in its original formulation (Winkler et al., 2021) and with a dynamically
+increasing maximum bulk snow density (Schroeder et al., 2024; Werkgarner, 2026). The \code{\link[=hs2swe]{hs2swe}}
+model is an alternative formulation of the same physical concept used in delta.snow (Magnusson et al., 2025).
+For a detailed discussion of the differences between the delta.snow and HS2SWE models see Werkgarner (2026).
 Some empirical regression models can also be chosen:
 \code{\link[=swe.jo09]{Jonas},\link[=swe.pi16]{Pistocchi}, \link[=swe.st10]{Sturm}} and \link[=swe.gu19]{Guyennon}.
 For the `delta.snow` and `hs2swe` models and the ones of `Pistocchi` and `Guyennon`,
@@ -96,15 +97,19 @@ summary(swe)
 \references{
 Guyennon, N., Valt, M., Salerno, F., Petrangeli, A., Romano, E. (2019) 'Estimating the snow water equivalent from snow depth measurements in the Italian Alps', Cold Regions Science and Technology. Elsevier, 167 (August), p. 102859. doi: 10.1016/j.coldregions.2019.102859.
 \cr\cr
-Jonas, T., Marty, C. and Magnusson, J. (2009) "Estimating the snow water equivalent from snow depth measurements in the Swiss Alps"", Journal of Hydrology, 378(1 - 2), pp. 161 - 167. doi: 10.1016/j.jhydrol.2009.09.021.
+Jonas, T., Marty, C. and Magnusson, J. (2009) "Estimating the snow water equivalent from snow depth measurements in the Swiss Alps", Journal of Hydrology, 378(1 - 2), pp. 161 - 167. doi: 10.1016/j.jhydrol.2009.09.021.
+\cr\cr
+Magnusson, J., Cluzet, B., Quéno, L., Mott, R., Oberrauch, M., Mazzotti, G., Marty, C., Jonas, T. (2025) "Evaluating methods to estimate the water equivalent of new snow from daily snow depth recordings", Cold Regions Science and Technology, 233, 104435. doi: 10.1016/j.coldregions.2025.104435.
 \cr\cr
 Pistocchi, A. (2016) "Simple estimation of snow density in an Alpine region", Journal of Hydrology: Regional Studies. Elsevier B.V., 6(Supplement C), pp. 82 - 89. doi: 10.1016/j.ejrh.2016.03.004.
 \cr\cr
+Schroeder, M. et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
+\cr\cr
 Sturm, M. et al. (2010) "Estimating Snow Water Equivalent Using Snow Depth Data and Climate Classes", Journal of Hydrometeorology, 11(6), pp. 1380 - 1394. doi: 10.1175/2010JHM1202.1.
 \cr\cr
-Winkler, M., Schellander, H., and Gruber, S.: Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021, 2021.
+Werkgarner, J. (2026): Improving the delta.snow model, Master's Thesis, University of Innsbruck.
 \cr\cr
-Schroeder, M.et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
+Winkler, M., Schellander, H., and Gruber, S. (2021): Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021.
 }
 \author{
 Harald Schellander, Michael Winkler
