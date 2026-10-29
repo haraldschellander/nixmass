@@ -134,16 +134,16 @@ swe.delta.snow <- function(
 ) {
   if (dyn_rho_max) {
     model_opts_defaults <- list(
-      sigma = 0.0332, #0.03,
-      mu = 86.2, #80,
-      rho_h = 688, #600,
-      rho_l = 265, #380,
-      rho.null = 107, #80.73706,
-      c.ov = 0.000585, #0.0005170964,
-      k.ov = 0.398, #0.3782312,
-      k = 0.0285, #0.029297,
-      tau = 0.0201, #0.02356521,
-      eta.null = 8900212, #8543502,
+      sigma = 0.0332,
+      mu = 86.2,
+      rho_h = 688,
+      rho_l = 265,
+      rho.null = 107,
+      c.ov = 0.000585,
+      k.ov = 0.398,
+      k = 0.0285,
+      tau = 0.0201,
+      eta.null = 8900212,
       timestep = 24
     )
   } else {
@@ -167,7 +167,7 @@ swe.delta.snow <- function(
     stop("data must be of class 'data.frame'")
   }
 
-  if (!all((is.element(colnames(data), c("hs", "date"))))) {
+  if (!all(c("hs", "date") %in% colnames(data))) {
     stop("data must contain at least two columns named 'date' and 'hs'")
   }
 
@@ -872,7 +872,7 @@ swe.delta.snow <- function(
             msg(m, t, paste("scaling: "))
           }
           if (layers) {
-            proc[[t]] <- paste("create new layer", ly + 1)
+            proc[[t]] <- paste("scaling", ly + 1)
           }
           ly.tot <- nrow(h)
           rl <- scaleH(
