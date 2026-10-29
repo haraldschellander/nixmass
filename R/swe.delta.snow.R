@@ -967,15 +967,3 @@ swe.delta.snow <- function(
 
   return(res)
 }
-
-start <- Sys.time()
-x1 <- swe.delta.snow(hsdata2)
-a <- Sys.time()
-print(a - start)
-x2 <- nixmass::swe.delta.snow(hsdata2)
-#x2 <- swe.delta.snow.para(hsdata3, cores = 4L)
-b <- Sys.time()
-print(b - a)
-x3 <- nixmass::hs2swe(hsdata2)
-c <- Sys.time()
-print(c - b)
