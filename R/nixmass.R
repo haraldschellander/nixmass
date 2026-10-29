@@ -473,7 +473,7 @@ plot.nixmass <- function(x, title = NULL, density = FALSE, ...) {
         y = "Snowdepth (cm)",
         fill = paste0("Density (kgm-3)\n", m)
       ) +
-      theme_bw() %+%
+      theme_bw() +
         theme(legend.position.inside = c(0.2, 0.65))
     return(p)
   }
