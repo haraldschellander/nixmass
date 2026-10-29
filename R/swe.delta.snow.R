@@ -266,9 +266,6 @@ swe.delta.snow <- function(
     stop("provided timestep does not fit your data")
   }
 
-  nixmass.e <- new.env()
-  nixmass.e$snowpack.dd <- NULL
-
   Hobs <- data$hs # observed snow depths [m]
   H <- numeric(length = length(Hobs)) # modeled total depth of snow at any day [m]
   SWE <- numeric(length = length(Hobs)) # modeled total SWE at any day [kg/m2]
@@ -281,10 +278,10 @@ swe.delta.snow <- function(
   h <- matrix(0, 1, 3) # modeled depth of snow in all layers [m]
   swe <- matrix(0, 1, 3) # modeled swe in all layers [kg/m2]
   age <- matrix(0, 1, 3) # age of modeled layers [days]
+  rho <- 0 # density of today's layers, from yesterday's compaction [kg/m3]
   day.tot <- length(Hobs) # total days from first to last snowfall [-]
 
   # helper
-  m <- rep("", day.tot) # vector of (verbose) messages
   proc <- list() # holds processes for return
   prec <- 10^-10 # precision for arithmetic comparisons [-]
 
@@ -306,7 +303,7 @@ swe.delta.snow <- function(
   }
 
   #-------------------------------------------------------------------------
-  # compaction of snowpack
+  # compaction of snowpack (vectorised over layers)
   #-------------------------------------------------------------------------
   dry_compaction <- function(
     h.d,
@@ -322,67 +319,37 @@ swe.delta.snow <- function(
   ) {
     # .d  -> today
     # .dd -> tomorrow
-    # compute overburden for each layer
-    # the overburden for the first layer is the layer itself
-    swe.hat.d <- numeric(length = length(ly.tot))
-    for (i in 1:ly.tot) {
-      swe.hat.d[i] <- sum(swe.d[i:ly.tot])
-    }
+    # Compaction of individual snow layers without additional load
+    # (Sturm and Holmgren, 1998); today's values -> tomorrow's values.
+    # Only the first `ly` layers hold snow, the rest is padded with zeros.
+    lys <- seq_len(ly)
+    h <- h.d[lys]
+    swe <- swe.d[lys]
 
-    snowpack.d <- data.frame(
-      h = h.d,
-      swe = swe.d,
-      swe.hat = swe.hat.d,
-      age = age.d
-    )
-    H.d <- sum(snowpack.d$h)
+    # overburden of each layer: the layer itself plus all layers above
+    swe.hat <- rev(cumsum(rev(swe.d)))[lys]
 
-    a <- data.frame(t(apply(
-      snowpack.d[(1:ly), ],
-      1,
-      compactH,
-      H.d,
-      k,
-      rho.max,
-      ts,
-      prec,
-      g,
-      model_opts$eta.null
-    )))
-    b <- data.frame(
-      rep(0, ly.tot - ly),
-      rep(0, ly.tot - ly),
-      rep(0, ly.tot - ly),
-      rep(0, ly.tot - ly)
-    )
-    colnames(a) <- colnames(b) <- c("h", "swe", "age", "rho")
-    nixmass.e$snowpack.dd <<- rbind(a, b)
-    rownames(nixmass.e$snowpack.dd) <<- paste0(
-      "dd.layer",
-      1:nrow(nixmass.e$snowpack.dd)
-    )
-    return(nixmass.e$snowpack.dd)
-  }
-
-  #-------------------------------------------------------------------------
-  # compaction of individual snow layers without additional load
-  # today's values are compacted to tomorrow's values
-  #-------------------------------------------------------------------------
-  compactH <- function(x, H.d, k, rho.max, ts, prec, g, eta.null) {
-    # .d  -> today
-    # .dd -> tomorrow
-    age.d <- ifelse(x[1] == 0, 0, x[4])
+    empty <- h == 0
+    age.0 <- ifelse(empty, 0, age.d[lys])
     if (dyn_rho_max) {
-      rho.max <- rho_max_dyn(age.d)
+      rho.max <- rho_max_dyn(age.0)
     }
-    h.dd <- x[1] / (1 + (x[3] * g * ts) / eta.null * exp(-k * x[2] / x[1]))
-    h.dd <- ifelse(x[2] / h.dd > rho.max, x[2] / rho.max, h.dd)
-    h.dd <- ifelse(x[1] == 0, 0, h.dd)
-    swe.dd <- x[2]
-    age.dd <- ifelse(x[1] == 0, 0, age.d + 1)
-    rho.dd <- ifelse(x[1] == 0, 0, swe.dd / h.dd)
+
+    h.dd <- h /
+      (1 + (swe.hat * g * ts) / model_opts$eta.null * exp(-k * swe / h))
+    h.dd <- ifelse(swe / h.dd > rho.max, swe / rho.max, h.dd)
+    h.dd <- ifelse(empty, 0, h.dd)
+    age.dd <- ifelse(empty, 0, age.0 + 1)
+    rho.dd <- ifelse(empty, 0, swe / h.dd)
     rho.dd <- ifelse(rho.max - rho.dd < prec, rho.max, rho.dd)
-    return(cbind(h = h.dd, swe = swe.dd, age = age.dd, rho = rho.dd))
+
+    pad <- numeric(ly.tot - ly)
+    list(
+      h = c(h.dd, pad),
+      swe = c(swe, pad),
+      age = c(age.dd, pad),
+      rho = c(rho.dd, pad)
+    )
   }
 
   #-------------------------------------------------------------------------
@@ -397,7 +364,7 @@ swe.delta.snow <- function(
       H[t + 1] <- sum(h[, 3])
       SWE[t + 1] <- sum(swe[, 3])
     }
-    return(list(h = h, swe = swe, age = age, H = H, SWE = SWE))
+    return(list(h = h, swe = swe, age = age, rho = sp.dd$rho, H = H, SWE = SWE))
   }
 
   drenchH <- function(
@@ -416,11 +383,10 @@ swe.delta.snow <- function(
     k.ov,
     k,
     ts,
-    prec,
-    m
+    prec
   ) {
     if (verbose) {
-      msg(m, t, paste("melt "))
+      msg(paste("melt "))
     }
 
     Hobs.d <- Hobs[t]
@@ -454,12 +420,12 @@ swe.delta.snow <- function(
     }
     if (all(rho.max - swe.d[1:ly] / h.d[1:ly] <= prec)) {
       if (verbose) {
-        msg(m, t, paste("no further compaction "))
+        msg(paste("no further compaction "))
       }
 
       # produce runoff if sum(h.d) - Hobs.d is still > 0
       if (verbose) {
-        msg(m, t, paste("runoff "))
+        msg(paste("runoff "))
       }
       scale <- Hobs.d / sum(h.d)
       if (dyn_rho_max) {
@@ -482,7 +448,7 @@ swe.delta.snow <- function(
         swe.d <- swe.d * scale
       }
     } else {
-      if (verbose) msg(m, t, paste("compaction "))
+      if (verbose) msg(paste("compaction "))
     }
 
     h[, 2] <- h.d
@@ -513,8 +479,9 @@ swe.delta.snow <- function(
     age <- rl$age
     H <- rl$H
     SWE <- rl$SWE
+    rho <- rl$rho
 
-    return(list(h = h, swe = swe, age = age, H = H, SWE = SWE))
+    return(list(h = h, swe = swe, age = age, rho = rho, H = H, SWE = SWE))
   }
 
   scaleH <- function(
@@ -532,8 +499,7 @@ swe.delta.snow <- function(
     rho.max,
     k,
     ts,
-    prec,
-    m
+    prec
   ) {
     # re-compact snowpack from previous timesteps values with adapted eta
     # .d  -> yesterday
@@ -549,21 +515,15 @@ swe.delta.snow <- function(
     }
 
     # todays overburden
-    swe.hat.d <- numeric(length = length(ly.tot))
-    for (i in 1:ly.tot) {
-      swe.hat.d[i] <- sum(swe.d[i:ly.tot])
-    }
+    swe.hat.d <- rev(cumsum(rev(swe.d)))
 
     # analytical solution for layerwise adapted viskosity eta
     # assumption: recompaction ~ linear depth change of yesterdays layers (see paper)
-    eta.cor <- c()
-    for (i in 1:ly.tot) {
-      rho.d <- swe.d[i] / h.d[i]
-      x <- ts * g * swe.hat.d[i] * exp(-k * rho.d) # yesterday
-      P <- h.d[i] / Hobs.d # yesterday
-      eta.i <- Hobs.dd * x * P / (h.d[i] - Hobs.dd * P)
-      eta.cor <- c(eta.cor, ifelse(is.na(eta.i), 0, eta.i))
-    }
+    rho.d <- swe.d / h.d
+    x <- ts * g * swe.hat.d * exp(-k * rho.d) # yesterday
+    P <- h.d / Hobs.d # yesterday
+    eta.cor <- Hobs.dd * x * P / (h.d - Hobs.dd * P)
+    eta.cor[is.na(eta.cor)] <- 0
 
     # compute H of today with corrected eta
     # so that modeled H = Hobs
@@ -619,7 +579,7 @@ swe.delta.snow <- function(
           i <- i - 1
           if (i <= 0 & swe.excess.all > 0) {
             if (verbose) {
-              msg(m, t, paste(" runoff"))
+              msg(paste(" runoff"))
             }
             break
           }
@@ -634,7 +594,7 @@ swe.delta.snow <- function(
           swe.excess <- swe.d[idx.max] - h.dd.cor[idx.max] * rho.max
         }
         swe.d[idx.max] <- swe.d[idx.max] - swe.excess
-        if (verbose) msg(m, t, paste(" runoff"))
+        if (verbose) msg(paste(" runoff"))
       }
     }
 
@@ -668,20 +628,16 @@ swe.delta.snow <- function(
     age <- rl$age
     H <- rl$H
     SWE <- rl$SWE
+    rho <- rl$rho
 
-    return(list(h = h, swe = swe, age = age, H = H, SWE = SWE))
+    return(list(h = h, swe = swe, age = age, rho = rho, H = H, SWE = SWE))
   }
 
   #-------------------------------------------------------------------------
-  # keep track of messages in a vector
+  # verbose output
   #-------------------------------------------------------------------------
-  msg <- function(m, t, strg) {
-    cat(paste(strg))
-    if (is.null(m[t])) {
-      m[t] <<- strg
-    } else {
-      m[t] <<- paste(m[t], strg)
-    }
+  msg <- function(strg) {
+    cat(strg)
   }
 
   if (verbose) {
@@ -691,7 +647,7 @@ swe.delta.snow <- function(
 
   for (t in 1:day.tot) {
     if (verbose) {
-      msg(m, t, paste0("day ", t, " (", data$date[t], "): "))
+      msg(paste0("day ", t, " (", data$date[t], "): "))
     }
 
     # shift temporary matrices one step back in time
@@ -710,18 +666,18 @@ swe.delta.snow <- function(
       if (t > 1) {
         if (Hobs[t - 1] == 0) {
           if (verbose) {
-            msg(m, t, paste0(""))
+            msg(paste0(""))
           }
           if (layers) proc[[t]] <- NA
         } else {
           if (verbose) {
-            msg(m, t, paste0("runoff"))
+            msg(paste0("runoff"))
           }
           if (layers) proc[[t]] <- "runoff"
         }
       } else {
         if (verbose) {
-          msg(m, t, paste0(""))
+          msg(paste0(""))
         }
         if (layers) proc[[t]] <- NA
       }
@@ -741,8 +697,12 @@ swe.delta.snow <- function(
       # first snow of snowfall event(s)
       if (Hobs[t - 1] == 0) {
         ly <- 1
+        # new snow season: nothing is carried over from earlier seasons
+        h <- matrix(0, 1, 3)
+        swe <- matrix(0, 1, 3)
+        age <- matrix(0, 1, 3)
         if (verbose) {
-          msg(m, t, paste("produce layer", ly))
+          msg(paste("produce layer", ly))
         }
         if (layers) {
           proc[[t]] <- paste("produce layer", ly)
@@ -775,6 +735,7 @@ swe.delta.snow <- function(
         age <- rl$age
         H <- rl$H
         SWE <- rl$SWE
+        rho <- rl$rho
 
         if (layers) {
           h_layers[[t]] <- h[, 2]
@@ -794,7 +755,7 @@ swe.delta.snow <- function(
 
         if (deltaH > model_opts$tau) {
           if (verbose) {
-            msg(m, t, paste("create new layer", ly + 1))
+            msg(paste("create new layer", ly + 1))
           }
           if (layers) {
             proc[[t]] <- paste("create new layer", ly + 1)
@@ -805,16 +766,16 @@ swe.delta.snow <- function(
               sigma.null *
               exp(
                 -model_opts$k.ov *
-                  nixmass.e$snowpack.dd$rho /
-                  (rho_max_dyn(age[, 2]) - nixmass.e$snowpack.dd$rho)
+                  rho /
+                  (rho_max_dyn(age[, 2]) - rho)
               )
           } else {
             epsilon <- model_opts$c.ov *
               sigma.null *
               exp(
                 -model_opts$k.ov *
-                  nixmass.e$snowpack.dd$rho /
-                  (model_opts$rho.max - nixmass.e$snowpack.dd$rho)
+                  rho /
+                  (model_opts$rho.max - rho)
               )
           }
 
@@ -859,6 +820,7 @@ swe.delta.snow <- function(
           age <- rl$age
           H <- rl$H
           SWE <- rl$SWE
+          rho <- rl$rho
 
           if (layers) {
             h_layers[[t]] <- h[, 2]
@@ -869,7 +831,7 @@ swe.delta.snow <- function(
           # no mass gain or loss, but scaling
         } else if (deltaH >= -model_opts$tau & deltaH <= model_opts$tau) {
           if (verbose) {
-            msg(m, t, paste("scaling: "))
+            msg(paste("scaling: "))
           }
           if (layers) {
             proc[[t]] <- paste("scaling", ly + 1)
@@ -890,14 +852,14 @@ swe.delta.snow <- function(
             model_opts$rho.max,
             model_opts$k,
             ts,
-            prec,
-            m
+            prec
           )
           h <- rl$h
           swe <- rl$swe
           age <- rl$age
           H <- rl$H
           SWE <- rl$SWE
+          rho <- rl$rho
 
           if (layers) {
             h_layers[[t]] <- h[, 2]
@@ -906,7 +868,7 @@ swe.delta.snow <- function(
           }
         } else if (deltaH < -model_opts$tau) {
           if (verbose) {
-            msg(m, t, paste("drenching: "))
+            msg(paste("drenching: "))
           }
           if (layers) {
             proc[[t]] <- paste("drenching: ")
@@ -928,14 +890,14 @@ swe.delta.snow <- function(
             model_opts$k.ov,
             model_opts$k,
             ts,
-            prec,
-            m
+            prec
           )
           h <- rl$h
           swe <- rl$swe
           age <- rl$age
           H <- rl$H
           SWE <- rl$SWE
+          rho <- rl$rho
 
           if (layers) {
             h_layers[[t]] <- h[, 2]
@@ -944,13 +906,13 @@ swe.delta.snow <- function(
           }
         } else {
           if (verbose) {
-            msg(m, t, "?")
+            msg("?")
           }
           if (layers) proc[[t]] <- "?"
         }
       }
     }
-    if (verbose) msg(m, t, "\n")
+    if (verbose) msg("\n")
   }
 
   # compile layers
@@ -1005,3 +967,15 @@ swe.delta.snow <- function(
 
   return(res)
 }
+
+start <- Sys.time()
+x1 <- swe.delta.snow(hsdata2)
+a <- Sys.time()
+print(a - start)
+x2 <- nixmass::swe.delta.snow(hsdata2)
+#x2 <- swe.delta.snow.para(hsdata3, cores = 4L)
+b <- Sys.time()
+print(b - a)
+x3 <- nixmass::hs2swe(hsdata2)
+c <- Sys.time()
+print(c - b)
