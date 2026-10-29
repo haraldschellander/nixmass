@@ -1,3 +1,16 @@
+nixmass v1.4.0 (release date: 2026-10-29)
+=========================================
+
+Changes:
+
+* Huge speed improvement through
+    - letting the layer matrices shrink to the actual number of layers.
+    - exchanching dry_compaction() and compactH() with plain vector arithmetic.
+    - vectorising the viscosity loop in scaleH().
+  A time-series of 35 years now computes roughly 20 times faster, a series of 105 years is ~40 times faster. 
+* Got rid of the superassignment operator "<<-"
+
+
 nixmass v1.3.2 (release date: 2026-09-28)
 =========================================
 
