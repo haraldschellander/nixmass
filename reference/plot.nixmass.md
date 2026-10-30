@@ -39,7 +39,7 @@ data("hsdata")
 plot(nixmass(hsdata, model = "delta.snow"))
 
 plot(nixmass(hsdata, model = "delta.snow.dyn_rho_max", layers = TRUE), density = TRUE)
-#> Warning: Removed 9720 rows containing missing values or values outside the scale range
+#> Warning: Removed 9246 rows containing missing values or values outside the scale range
 #> (`geom_col()`).
 
 ```

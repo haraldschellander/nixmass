@@ -9,7 +9,29 @@ with \(\rho_i(t_{i+1}) and \rho_i(t_i)\) being tomorrow's and today's
 respective density of layer i, the gravitational acceleration
 \(g = 9.8ms^{-2}\), viscosity \(\eta_0\) (Pa) and
 factor \(k2 [m^3kg^{-1}\)], determining the importance
+of today's for tomorrow's density.
+Model daily values of Snow Water Equivalent solely from daily differences of snow depth.
+swe.delta.snow computes SWE solely from daily changes of snow depth
+at an observation site.
+Compression of a snow layer without additional load on top is computed on
+the basis of Sturm and Holmgren (1998), who regard snow as a viscous fluid:
+$$\rho_i(t_{i+1}) = \rho_i(t_i)*(1+(SWE*g)/\eta_0 * exp^{-k_2*\rho_i(t_i)})$$
+with \(\rho_i(t_{i+1}) and \rho_i(t_i)\) being tomorrow's and today's
+respective density of layer i, the gravitational acceleration
+\(g = 9.8ms^{-2}\), viscosity \(\eta_0\) (Pa) and
+factor \(k2 [m^3kg^{-1}\)], determining the importance
 of today's for tomorrow's density."><meta property="og:description" content="Model daily values of Snow Water Equivalent solely from daily differences of snow depth.
+swe.delta.snow computes SWE solely from daily changes of snow depth
+at an observation site.
+Compression of a snow layer without additional load on top is computed on
+the basis of Sturm and Holmgren (1998), who regard snow as a viscous fluid:
+$$\rho_i(t_{i+1}) = \rho_i(t_i)*(1+(SWE*g)/\eta_0 * exp^{-k_2*\rho_i(t_i)})$$
+with \(\rho_i(t_{i+1}) and \rho_i(t_i)\) being tomorrow's and today's
+respective density of layer i, the gravitational acceleration
+\(g = 9.8ms^{-2}\), viscosity \(\eta_0\) (Pa) and
+factor \(k2 [m^3kg^{-1}\)], determining the importance
+of today's for tomorrow's density.
+Model daily values of Snow Water Equivalent solely from daily differences of snow depth.
 swe.delta.snow computes SWE solely from daily changes of snow depth
 at an observation site.
 Compression of a snow layer without additional load on top is computed on
@@ -27,7 +49,7 @@ of today's for tomorrow's density."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">nixmass</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,6 +85,17 @@ respective density of layer i, the gravitational acceleration
 \(g = 9.8ms^{-2}\), viscosity \(\eta_0\) (Pa) and
 factor \(k2 [m^3kg^{-1}\)], determining the importance
 of today's for tomorrow's density.</p>
+<p>Model daily values of Snow Water Equivalent solely from daily differences of snow depth.</p>
+<p><code>swe.delta.snow</code> computes SWE solely from daily changes of snow depth
+at an observation site. <br>
+Compression of a snow layer without additional load on top is computed on
+the basis of Sturm and Holmgren (1998), who regard snow as a viscous fluid: <br>
+$$\rho_i(t_{i+1}) = \rho_i(t_i)*(1+(SWE*g)/\eta_0 * exp^{-k_2*\rho_i(t_i)})$$
+with \(\rho_i(t_{i+1}) and \rho_i(t_i)\) being tomorrow's and today's
+respective density of layer i, the gravitational acceleration
+\(g = 9.8ms^{-2}\), viscosity \(\eta_0\) (Pa) and
+factor \(k2 [m^3kg^{-1}\)], determining the importance
+of today's for tomorrow's density.</p>
     </div>
 
     <div class="section level2">
@@ -73,7 +106,18 @@ of today's for tomorrow's density.</p>
 <span>  dyn_rho_max <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  layers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  strict_mode <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  cores <span class="op">=</span> <span class="fl">1L</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">swe.delta.snow</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  model_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  dyn_rho_max <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  layers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  strict_mode <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  cores <span class="op">=</span> <span class="fl">1L</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -113,16 +157,73 @@ if the snow depth series starts with zero.</p></dd>
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Should additional information be given during runtime? Can be <code>TRUE</code> or <code>FALSE</code>.</p></dd>
 
+
+<dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>
+<dd><p>Number of cores. A snow-free day resets the model, so every snow-covered period is modelled
+independently and, if <code>cores &gt; 1</code>, in parallel (forking on Unix-alikes, a PSOCK cluster on Windows).
+Ignored (set to 1) if <code>verbose = TRUE</code>. Default is 1.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>If <code>layers=FALSE</code>, a vector with daily SWE values in mm. If <code>layers=TRUE</code>, a list with layerwise matrices
 of the parameters h (snow depth), swe and age is returned in addition to the SWE vector. The matrix rows correspond to <code>layers</code>,
 columns correspond to <code>dates</code>. swe is in mm, h in m and age in days.</p>
+<p>If <code>layers=FALSE</code>, a vector with daily SWE values in mm. If <code>layers=TRUE</code>, a list with layerwise matrices
+of the parameters h (snow depth), swe and age is returned in addition to the SWE vector. The matrix rows correspond to <code>layers</code>,
+columns correspond to <code>dates</code>. swe is in mm, h in m and age in days.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>If <code>dyn_rho_max=TRUE</code>, the bulk snow density varies with layer age. As activation function,
+<code>atan</code> is used, where the S-curve symmetrically transitions from the lower to the upper density bound.
+In that case, <code>model_opts</code> are extended by a lower density bound <code>rho_l</code>,
+an upper density bound <code>rho_h</code>, a slope <code>sigma</code> and a midpoint <code>mu</code>,
+which together with the other parameters have been found via the improved optimization procedure of Werkgarner (2026).
+There, all ten parameters were optimized simultaneously (Nelder-Mead) against daily SWE simulated by SNOWPACK
+at eight alpine stations, using the Kling-Gupta efficiency of SWE as objective.
+Among several calibration datasets and objective functions, this set performed best in an independent validation
+against SWE and new-snow water equivalent observations.
+Altering one or more of the model parameters can be done with the option <code>model_opts</code>,
+which must provide a named list with the altered parameters. Be aware that altering only one parameter
+may have negative effects on model accuracy, as during an optimization procedure, all parameters are balanced to yield
+a minimum loss.</p>
+<p>The following model coefficients must be provided:</p>
+<p><code>dyn_rho_max=FALSE</code>:</p><ul><li><p><code>rho.max</code> Maximum density of an individual snow layer produced by
+the delta.snow model (kg/m3), \(rho.max &gt; 0\). Default is rho.max=401.2588 kg/m3.</p></li>
+<li><p><code>rho.null</code> Fresh snow density for a newly created layer (kg/m3), \(rho.null &gt; 0\).
+Currently optimized for daily snow depth observations. Default is rho.null=81.19417 kg/m3.</p></li>
+<li><p><code>c.ov</code> Overburden factor due to fresh snow (-), \(c.ov &gt; 0\). Default is c.ov=0.0005104722.</p></li>
+<li><p><code>k.ov</code> Defines the impact of the individual layer density on the
+compaction due to overburden (-), \(k.ov \in [0,1]\). Default is k.ov=0.37856737.</p></li>
+<li><p><code>k</code> Exponent of the exponential-law compaction (m3/kg), \(k &gt; 0\). Default is k=0.02993175 m3/kg.</p></li>
+<li><p><code>tau</code> Uncertainty bound (m), \(tau &gt; 0\). Default is tau=0.02362476 m.</p></li>
+<li><p><code>eta.null</code> Effective compactive viscosity of snow for "zero-density" (Pa s). Default is eta.null=8523356 (Pa s).</p></li>
+<li><p><code>timestep</code> Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.
+No sub-daily values are allowed at the moment (see details).</p></li>
+</ul><p><code>dyn_rho_max=TRUE</code>:</p>
+<p>Instead of a constant coefficient for <code>rho.max</code>, these four
+parameters describe the smooth S-curve approximated by the <code>atan</code> trigonometric function.</p><ul><li><p><code>sigma</code> Steepness or slope of <code>atan</code> at its midpoint <code>mu</code>, (-), \(sigma &gt; 0\). Default is sigma=0.0332.</p></li>
+<li><p><code>mu</code> Central midpoint in days, where the steepest transition occurs (days), \(mu &gt; 0\). Default mu=86.2 days.</p></li>
+<li><p><code>rho_h</code> Upper density bound for a single layer and the whole snow pack (kg/m3), \(rho_h &gt; 0\). Default is rho_h=688 kg/m3.</p></li>
+<li><p><code>rho_l</code> Lower density bound for a single layer and the whole snow pack, where the transition begins
+(kg/m3), \(rho_l &gt; 0\). Default is rho_l=265 kg/m3.</p></li>
+</ul><p>All other coefficients are needed as well. Note that they differ from the constant rho_max version:</p><ul><li><p><code>rho.null</code> Fresh snow density for a newly created layer (kg/m3), \(rho.null &gt; 0\). Default is rho.null=107 kg/m3.</p></li>
+<li><p><code>c.ov</code> Overburden factor due to fresh snow (-), \(c.ov &gt; 0\). Default is c.ov=0.000585.</p></li>
+<li><p><code>k.ov</code> Defines the impact of the individual layer density on the
+compaction due to overburden (-), \(k.ov \in [0,1]\). Default is k.ov=0.398.</p></li>
+<li><p><code>k</code> Exponent of the exponential-law compaction (m3/kg), \(k &gt; 0\). Default is k=0.0285.</p></li>
+<li><p><code>tau</code> Uncertainty bound (m), \(tau &gt; 0\). Default is tau=0.0201 m.</p></li>
+<li><p><code>eta.null</code> Effective compactive viscosity of snow for "zero-density" (Pa s). Default is eta.null=8900212 (Pa s).</p></li>
+<li><p><code>timestep</code> Timestep between snow depth observations in hours. Default is 24 hours, i.e. daily snow depth observations.</p></li>
+</ul><p>The easiest way to call the original delta.snow model is <code>swe.delta.snow(hsdata, dyn_rho_max = FALSE)</code>.
+Note that parameters intrinsic to the dynamic density model provided with the original model
+are silently ignored.</p>
+<p>In principle, the model is able to cope with a sub-daily temporal resolution,
+e.g. hourly snow depth observations. However, the model was fitted to daily observations,
+and the model parameter <code>rho.null</code> reflects that. In other words, if the observation frequency changes,
+<code>rho.null</code> should change as well. Currently, no sub-daily resolution is allowed.</p>
+<p>If <code>dyn_rho_max=TRUE</code>, the bulk snow density varies with layer age. As activation function,
 <code>atan</code> is used, where the S-curve symmetrically transitions from the lower to the upper density bound.
 In that case, <code>model_opts</code> are extended by a lower density bound <code>rho_l</code>,
 an upper density bound <code>rho_h</code>, a slope <code>sigma</code> and a midpoint <code>mu</code>,
@@ -184,6 +285,17 @@ Sturm, M., Holmgren, J. (1998) "Differences in compaction behavior of three clim
 Werkgarner, J. (2026): Improving the delta.snow model, Master's Thesis, University of Innsbruck.
 <br><br>
 Winkler, M., Schellander, H., and Gruber, S. (2021): Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021.</p>
+<p>Gruber, S. (2014) "Modelling snow water equivalent based on daily snow depths", Master's Thesis, Institute for Atmospheric and Cryospheric Sciences, University of Innsbruck.
+<br><br>
+Martinec, J., Rango, A. (1991) "Indirect evaluation of snow reserves in mountain basins". Snow, Hydrology and Forests in High Alpine Areas. pp. 111-120.
+<br><br>
+Schroeder, M. et al. (2024) "CONTINUOUS SNOW WATER EQUIVALENT MONITORING ON GLACIERS USING COSMIC RAY NEUTRON SENSOR TECHNOLOGY A CASE STUDY ON HINTEREISFERNER, AUSTRIA", Proceedings: International Snow Science Workshop 2024, Tromsø, Norway, 1107 - 1114
+<br><br>
+Sturm, M., Holmgren, J. (1998) "Differences in compaction behavior of three climate classes of snow". Annals of Glaciology 26, 125-130.
+<br><br>
+Werkgarner, J. (2026): Improving the delta.snow model, Master's Thesis, University of Innsbruck.
+<br><br>
+Winkler, M., Schellander, H., and Gruber, S. (2021): Snow water equivalents exclusively from snow depths and their temporal changes: the delta.snow model, Hydrol. Earth Syst. Sci., 25, 1165-1187, doi: 10.5194/hess-25-1165-2021.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -202,6 +314,17 @@ Winkler, M., Schellander, H., and Gruber, S. (2021): Snow water equivalents excl
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"delta.snow"</span>, <span class="st">"topleft"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SWE dyn"</span>, <span class="st">"SWE"</span>, <span class="st">"HS"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span> col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"red"</span>, <span class="st">"grey30"</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="swe.delta.snow-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">hsdata</span>, package <span class="op">=</span> <span class="st">"nixmass"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">swe_dyn</span> <span class="op">&lt;-</span> <span class="fu">swe.delta.snow</span><span class="op">(</span><span class="va">hsdata</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">swe</span> <span class="op">&lt;-</span> <span class="fu">swe.delta.snow</span><span class="op">(</span><span class="va">hsdata</span>, dyn_rho_max <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">hsdata</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>, <span class="va">swe_dyn</span>, type <span class="op">=</span> <span class="st">"l"</span>, ylab <span class="op">=</span> <span class="st">"SWE (mm) / hs (cm)"</span>, xlab <span class="op">=</span> <span class="st">"day"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">hsdata</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>, <span class="va">swe</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">hsdata</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>, <span class="va">hsdata</span><span class="op">$</span><span class="va">hs</span> <span class="op">*</span> <span class="fl">100</span>, type <span class="op">=</span> <span class="st">"l"</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"grey30"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"delta.snow"</span>, <span class="st">"topleft"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SWE dyn"</span>, <span class="st">"SWE"</span>, <span class="st">"HS"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span> col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"red"</span>, <span class="st">"grey30"</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="swe.delta.snow-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
