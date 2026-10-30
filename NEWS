@@ -3,21 +3,16 @@ nixmass v1.4.0 (release date: 2026-10-29)
 
 Changes:
 
-* Huge speed improvement through
-    - letting the layer matrices shrink to the actual number of layers.
-    - exchanching dry_compaction() and compactH() with plain vector arithmetic.
-    - vectorising the viscosity loop in scaleH().
-  A time-series of 35 years now computes roughly 20 times faster, a series of 105 years is ~40 times faster. 
-* Got rid of the superassignment operator "<<-"
-
-
-nixmass v1.3.2 (release date: 2026-09-28)
-=========================================
-
-Changes:
-
 * Updated standard model parameters for the dynamical rho_max version
 of delta.snow using the new calibration scheme developed by Jakob Werkgarner (PR #12).
+* Huge performance improvements:
+    - The layer matrices now shrink to the actual number of layers.
+    - The dry_compaction() and compactH() functions have been exchanged with plain vector arithmetic.
+    - The viscosity loop in scaleH() is vectorised.
+    Note that with `layers = TRUE` the number of returned layers is now the maximum layers
+    in any single season instead of the all-time layer count.
+  A time-series of 35 years now computes roughly 20 times faster, a series of 105 years is ~40 times faster. 
+* Got rid of the superassignment operator "<<-"
 
 
 nixmass v1.3.1 (release date: 2025-05-09)
