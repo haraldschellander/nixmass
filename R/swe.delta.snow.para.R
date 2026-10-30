@@ -127,7 +127,7 @@ utils::globalVariables(c("hs"))
 #' legend(title = "delta.snow", "topleft", legend = c("SWE dyn", "SWE", "HS"),
 #'  col = c("black", "red", "grey30"), lty = c(1, 1, 2))
 #'
-swe.delta.snow <- function(
+swe.delta.snow.para <- function(
   data,
   model_opts = list(),
   dyn_rho_max = TRUE,
