@@ -1,5 +1,7 @@
 # nixmass
 
+![My koi](koi/koi.gif)
+
 R-package with functions for Snow Water Equivalent Modeling with the
 $`\Delta\text{SNOW}`$ Model, the HS2SWE Model and some Empirical
 Regression Models.
