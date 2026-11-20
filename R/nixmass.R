@@ -199,18 +199,18 @@ nixmass <- function(
         data,
         model_opts = list(),
         dyn_rho_max = FALSE,
-        layers,
-        strict_mode,
-        verbose
+        layers = layers,
+        strict_mode = strict_mode,
+        verbose = verbose
       )
     } else if (m == "delta.snow.dyn_rho_max") {
       swe[["swe"]][[m]] <- swe.delta.snow(
         data,
         model_opts = list(),
         dyn_rho_max = TRUE,
-        strict_mode,
-        layers,
-        verbose
+        layers = layers,
+        strict_mode = strict_mode,
+        verbose = verbose
       )
     } else if (m == "hs2swe") {
       swe[["swe"]][[m]] <- hs2swe(data)

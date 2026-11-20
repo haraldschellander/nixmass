@@ -1,3 +1,11 @@
+nixmass v1.4.1 (release date: 2026-11-20)
+=========================================
+
+Changes:
+
+* Fxed a bug in `nixmass()` where the `layers` and `strict_mode` arguments were swapped for model `delta.snow.dyn_rho_max`.
+
+
 nixmass v1.4.0 (release date: 2026-10-29)
 =========================================
 

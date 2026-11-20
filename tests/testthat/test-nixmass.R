@@ -118,3 +118,10 @@ test_that("nixmass returns results for both models when layers=TRUE", {
         expect_true("delta.snow" %in% names(result$swe))
         expect_true("delta.snow.dyn_rho_max" %in% names(result$swe))
 })
+test_that("layers and strict_mode are passed through correctly for both delta.snow variants", {
+     data("hsdata", package = "nixmass")
+     for (m in c("delta.snow", "delta.snow.dyn_rho_max")) {
+          o <- nixmass(hsdata, model = m, layers = TRUE, strict_mode = FALSE)
+          expect_true(all(c("h", "swe", "age") %in% names(o$swe[[m]])))
+     }
+})
