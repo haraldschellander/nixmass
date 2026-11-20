@@ -12,12 +12,12 @@
 
 Schellander H (2026). *nixmass: Snow Water Equivalent Modeling with the
 'Delta.snow' and 'HS2SWE' Models and Empirical Regression Models*. R
-package version 1.4.0, <https://haraldschellander.github.io/nixmass/>.
+package version 1.4.1, <https://haraldschellander.github.io/nixmass/>.
 
     @Manual{,
       title = {nixmass: Snow Water Equivalent Modeling with the 'Delta.snow' and 'HS2SWE' Models and Empirical Regression Models},
       author = {Harald Schellander},
       year = {2026},
-      note = {R package version 1.4.0},
+      note = {R package version 1.4.1},
       url = {https://haraldschellander.github.io/nixmass/},
     }
